@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eliminación de datos — MiRadio</title>
+<style>
+  :root {
+    --tinta: #1d2530;
+    --tinta-suave: #4c5866;
+    --fondo: #fbfbf9;
+    --acento: #0b5c8e;
+    --linea: #e3e2dc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--fondo);
+    color: var(--tinta);
+    line-height: 1.7;
+    font-size: 17px;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+  .encabezado {
+    border-bottom: 2px solid var(--tinta);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  .app-nombre {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--acento);
+    margin-bottom: 8px;
+  }
+  h1 { font-size: 34px; font-weight: normal; line-height: 1.2; }
+  .fecha {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: var(--tinta-suave);
+    margin-top: 12px;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: normal;
+    margin: 44px 0 12px;
+    padding-top: 20px;
+    border-top: 1px solid var(--linea);
+  }
+  p, li { margin-bottom: 12px; }
+  ul, ol { padding-left: 22px; margin-bottom: 12px; }
+  ol li { margin-bottom: 8px; }
+  a { color: var(--acento); }
+  .nota {
+    background: #eef3f7;
+    border-left: 3px solid var(--acento);
+    padding: 14px 18px;
+    font-size: 15.5px;
+    margin: 16px 0;
+  }
+  .ruta {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    background: #f0efe9;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  strong { font-weight: 600; }
+  @media (max-width: 480px) {
+    body { font-size: 16px; }
+    h1 { font-size: 27px; }
+    .ruta { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="encabezado">
+    <div class="app-nombre">MiRadio · ThalmorCoding</div>
+    <h1>Eliminación de datos</h1>
+    <div class="fecha">Última actualización: 13 de julio de 2026</div>
+  </div>
+
+  <p>Esta página explica cómo eliminar los datos asociados al uso de la aplicación <strong>MiRadio</strong>, desarrollada por <strong>ThalmorCoding</strong>.</p>
+
+  <div class="nota"><strong>Importante:</strong> MiRadio no requiere crear una cuenta y no almacena datos personales en servidores propios. Toda la información de la App (favoritos y preferencias) vive únicamente en su dispositivo, por lo que la eliminación está bajo su control directo y es inmediata.</div>
+
+  <h2>1. Eliminar los datos guardados en su dispositivo</h2>
+  <p>Los favoritos, la última emisora reproducida y las preferencias se borran de forma completa y permanente con cualquiera de estas dos opciones:</p>
+  <ol>
+    <li><strong>Desinstalar la App:</strong> mantenga presionado el ícono de MiRadio y elija <em>Desinstalar</em>. Android elimina todos los datos de la App junto con ella.</li>
+    <li><strong>Borrar los datos sin desinstalar:</strong> vaya a <span class="ruta">Ajustes → Aplicaciones → MiRadio → Almacenamiento → Borrar datos</span>. La App quedará como recién instalada.</li>
+  </ol>
+
+  <h2>2. Datos publicitarios (versión gratuita)</h2>
+  <p>La publicidad de la versión gratuita la gestiona Google AdMob. Los datos que ese servicio pueda haber recopilado (identificador de publicidad, ubicación aproximada por IP, interacción con anuncios) los trata Google, no ThalmorCoding. Para gestionarlos:</p>
+  <ul>
+    <li><strong>Eliminar o restablecer su identificador de publicidad:</strong> <span class="ruta">Ajustes → Google → Anuncios → Eliminar ID de publicidad</span>. Al eliminarlo, los datos asociados dejan de vincularse a su dispositivo.</li>
+    <li><strong>Retirar el consentimiento de publicidad personalizada:</strong> dentro de la App, opción <em>Privacidad</em> en los ajustes.</li>
+    <li><strong>Ejercer sus derechos ante Google:</strong> consulte <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a> y las herramientas de <a href="https://myadcenter.google.com" target="_blank" rel="noopener">myadcenter.google.com</a>.</li>
+  </ul>
+
+  <h2>3. Datos de la suscripción premium</h2>
+  <p>La suscripción se procesa mediante Google Play. ThalmorCoding no almacena datos de pago. Puede cancelarla y gestionar su historial desde <a href="https://play.google.com/store/account/subscriptions" target="_blank" rel="noopener">play.google.com/store/account/subscriptions</a>. Los registros de la transacción los conserva Google conforme a sus políticas.</p>
+
+  <h2>4. ¿Qué datos se eliminan y cuáles conserva un tercero?</h2>
+  <ul>
+    <li><strong>Se eliminan por completo al desinstalar o borrar datos:</strong> favoritos, preferencias, última emisora, estado local de la suscripción.</li>
+    <li><strong>Los conserva Google según sus propias políticas:</strong> datos publicitarios de AdMob (gestionables con los pasos de la sección 2) y registros de compras de Google Play.</li>
+    <li><strong>ThalmorCoding no conserva nada:</strong> no operamos servidores con datos personales de usuarios.</li>
+  </ul>
+
+  <h2>5. Solicitudes y consultas</h2>
+  <p>Si tiene cualquier duda o desea asistencia con la eliminación de datos, escriba a <strong>[tu-correo@ejemplo.com]</strong> indicando "Eliminación de datos — MiRadio" en el asunto. Responderemos dentro de un plazo máximo de 30 días.</p>
+
+  <p style="margin-top:32px">También puede consultar nuestra <a href="politica-privacidad-miradio.html">Política de Privacidad</a> completa.</p>
+</main>
+</body>
+</html>
