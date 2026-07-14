@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recetario de casa</title>
+<style>
+  :root{
+    --bg:#faf8f5;
+    --card:#ffffff;
+    --text:#2b2420;
+    --muted:#6b6058;
+    --border:#e8e1d8;
+    --accent:#b5502f;
+    --accent-soft:#f3e2da;
+    --tag-carne:#f6dede; --tag-carne-text:#8a3030;
+    --tag-pollo:#fbeecb; --tag-pollo-text:#8a6a12;
+    --tag-cerdo:#f0e2f6; --tag-cerdo-text:#6a3a8a;
+    --tag-relleno:#dcefe3; --tag-relleno-text:#2f6b47;
+    --shadow: 0 1px 2px rgba(30,20,10,0.06), 0 4px 14px rgba(30,20,10,0.06);
+    --warn-bg:#fdf0e2; --warn-text:#8a5a12;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1b1815;
+      --card:#242019;
+      --text:#f1ece4;
+      --muted:#b3a89c;
+      --border:#3a332b;
+      --accent:#e2794f;
+      --accent-soft:#3a2620;
+      --tag-carne:#4a2626; --tag-carne-text:#f0b7b7;
+      --tag-pollo:#4a3d1c; --tag-pollo-text:#f2d998;
+      --tag-cerdo:#3c2c48; --tag-cerdo-text:#dcb8f0;
+      --tag-relleno:#20402c; --tag-relleno-text:#a9e0bd;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 14px rgba(0,0,0,0.35);
+      --warn-bg:#3a2c14; --warn-text:#f2c98a;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:20px 16px 60px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{margin-bottom:20px;}
+  h1{font-size:1.5rem;margin:0 0 4px;}
+  .sub{color:var(--muted);font-size:0.92rem;margin:0;}
+  .back{display:inline-block;margin-bottom:10px;color:var(--accent);font-size:0.85rem;text-decoration:none;}
+  .back:hover{text-decoration:underline;}
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:16px;
+    margin-bottom:18px;
+  }
+  .panel h2{font-size:1rem;margin:0 0 12px;}
+
+  form.add-form{display:flex;flex-direction:column;gap:10px;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;}
+  .row > *{flex:1;min-width:140px;}
+  label{font-size:0.78rem;color:var(--muted);display:block;margin-bottom:4px;}
+  input[type=text], select, textarea{
+    width:100%;
+    padding:9px 10px;
+    border-radius:9px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--text);
+    font-size:0.95rem;
+    font-family:inherit;
+  }
+  button{
+    cursor:pointer;
+    border:none;
+    border-radius:9px;
+    padding:10px 16px;
+    font-size:0.95rem;
+    font-weight:600;
+  }
+  button:disabled{opacity:0.6;cursor:default;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:active{opacity:0.85;}
+  .btn-secondary{background:transparent;color:var(--muted);border:1px solid var(--border);}
+  .btn-ghost{background:var(--accent-soft);color:var(--accent);}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--muted);
+    font-size:0.82rem;
+    cursor:pointer;
+    user-select:none;
+  }
+  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+  #search{margin-bottom:14px;}
+
+  .grid{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media(min-width:560px){.grid{grid-template-columns:1fr 1fr;}}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    position:relative;
+  }
+  .card.highlight{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);}
+  .card h3{margin:0;font-size:1rem;padding-right:50px;}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;}
+  .tag{font-size:0.7rem;padding:3px 8px;border-radius:999px;font-weight:600;}
+  .tag.carne{background:var(--tag-carne);color:var(--tag-carne-text);}
+  .tag.pollo{background:var(--tag-pollo);color:var(--tag-pollo-text);}
+  .tag.cerdo{background:var(--tag-cerdo);color:var(--tag-cerdo-text);}
+  .tag.relleno{background:var(--tag-relleno);color:var(--tag-relleno-text);}
+  .tag.coc{background:transparent;border:1px solid var(--border);color:var(--muted);}
+  .card-actions{position:absolute;top:8px;right:8px;display:flex;gap:2px;}
+  .icon-btn{
+    background:none;border:none;color:var(--muted);
+    font-size:0.9rem;padding:3px 6px;border-radius:6px;
+  }
+  .icon-btn:hover{color:var(--accent);}
+  .card p.extra{margin:4px 0 0;font-size:0.85rem;color:var(--muted);}
+
+  .empty{color:var(--muted);font-size:0.9rem;text-align:center;padding:30px 0;}
+
+  .note{
+    font-size:0.8rem;
+    color:var(--muted);
+    background:var(--accent-soft);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-top:6px;
+  }
+  .count{color:var(--muted);font-size:0.85rem;margin-bottom:10px;}
+
+  .ai-result{
+    border:1px dashed var(--accent);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-top:12px;
+    background:var(--accent-soft);
+  }
+  .ai-result h3{margin:0 0 6px;}
+  .ai-result .btn-row{margin-top:10px;}
+  .spinner{
+    display:inline-block;width:14px;height:14px;
+    border:2px solid var(--border);border-top-color:var(--accent);
+    border-radius:50%;animation:spin .7s linear infinite;
+    vertical-align:middle;margin-right:6px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .small{font-size:0.78rem;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="/" class="back">← Volver a ThalmorCoding</a>
+  <header>
+    <h1>🍽️ Recetario de casa</h1>
+    <p class="sub">Se guarda en este navegador. Agregá, editá, sorteá o inventá algo nuevo con IA.</p>
+  </header>
+
+  <div class="panel">
+    <h2 id="formTitle">Agregar comida o receta</h2>
+    <form class="add-form" id="addForm">
+      <input type="hidden" id="editingId" value="">
+      <div class="row">
+        <div>
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" placeholder="Ej: Pollo al verdeo" required>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="categoria">Proteína / tipo</label>
+          <select id="categoria">
+            <option value="carne">Carne vacuna</option>
+            <option value="pollo">Pollo</option>
+            <option value="cerdo">Cerdo / embutidos</option>
+            <option value="relleno">Relleno / masa / veggie</option>
+          </select>
+        </div>
+        <div>
+          <label for="coccion">Cocción</label>
+          <select id="coccion">
+            <option value="Horno">Horno</option>
+            <option value="Plancha/Parrilla">Plancha / Parrilla</option>
+            <option value="Frito">Frito</option>
+            <option value="Hervido/Guisado">Hervido / guisado</option>
+            <option value="Relleno al horno">Relleno al horno</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="detalle">Ingredientes / notas (opcional)</label>
+          <input type="text" id="detalle" placeholder="Ej: pechuga, mostaza, crema">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="submit" class="btn-primary" id="submitBtn">+ Agregar a la lista</button>
+        <button type="button" class="btn-secondary" id="cancelEdit" style="display:none;">Cancelar edición</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>¿Qué comemos?</h2>
+    <div class="btn-row">
+      <button class="btn-ghost" id="randomBtn" type="button">🎲 Elegir al azar</button>
+      <button class="btn-ghost" id="inventBtn" type="button">✨ Inventar una receta nueva</button>
+    </div>
+    <div id="aiResult"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Filtrar</h2>
+    <input type="text" id="search" placeholder="Buscar por nombre...">
+    <div class="filters" id="catFilters"></div>
+    <div class="filters" id="cocFilters"></div>
+  </div>
+
+  <div class="btn-row" style="margin-bottom:10px;">
+    <button class="btn-secondary" id="exportBtn" type="button">⬇️ Exportar backup</button>
+    <button class="btn-secondary" id="importBtn" type="button">⬆️ Importar backup</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none;">
+  </div>
+
+  <p class="count" id="count"></p>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="emptyMsg" style="display:none;">No hay comidas que coincidan con el filtro.</div>
+</div>
+
+<script>
+const CAT_LABELS = {carne:"Carne vacuna", pollo:"Pollo", cerdo:"Cerdo / embutidos", relleno:"Relleno / masa"};
+const STORAGE_KEY = 'recetario_recipes_v1';
+
+const DEFAULT_RECIPES = [
+  {n:"Matambre", cat:"carne", coc:"Plancha/Parrilla", d:""},
+  {n:"Pizza", cat:"relleno", coc:"Horno", d:""},
+  {n:"Milanesa", cat:"carne", coc:"Frito", d:""},
+  {n:"Hamburguesa", cat:"carne", coc:"Plancha/Parrilla", d:""},
+  {n:"Zapallito relleno", cat:"relleno", coc:"Relleno al horno", d:""},
+  {n:"Carne al horno", cat:"carne", coc:"Horno", d:""},
+  {n:"Tacos", cat:"relleno", coc:"Hervido/Guisado", d:""},
+  {n:"Tarteletitas de pollo", cat:"pollo", coc:"Horno", d:""},
+  {n:"Salchichas con panceta", cat:"cerdo", coc:"Plancha/Parrilla", d:""},
+  {n:"Arroz con pollo", cat:"pollo", coc:"Hervido/Guisado", d:""},
+  {n:"Bife con papas y cebolla", cat:"carne", coc:"Plancha/Parrilla", d:""},
+  {n:"Tarta", cat:"relleno", coc:"Horno", d:""},
+  {n:"Lasaña", cat:"relleno", coc:"Horno", d:""},
+  {n:"Empanadas", cat:"relleno", coc:"Horno", d:""},
+  {n:"Bondiola", cat:"cerdo", coc:"Horno", d:""},
+  {n:"Panchos", cat:"cerdo", coc:"Hervido/Guisado", d:""},
+  {n:"Pollo frito", cat:"pollo", coc:"Frito", d:""},
+  {n:"Nuggets", cat:"pollo", coc:"Frito", d:""},
+  {n:"Pechuga a la plancha", cat:"pollo", coc:"Plancha/Parrilla", d:""},
+  {n:"Pastel de papas", cat:"carne", coc:"Horno", d:""},
+  {n:"Canelones", cat:"relleno", coc:"Horno", d:""},
+  {n:"Suprema a la parmesana", cat:"pollo", coc:"Frito", d:""},
+  {n:"Berenjenas rellenas", cat:"relleno", coc:"Relleno al horno", d:""},
+  {n:"Matambrito de cerdo a la plancha", cat:"cerdo", coc:"Plancha/Parrilla", d:""},
+  {n:"Pollo al verdeo", cat:"pollo", coc:"Hervido/Guisado", d:""},
+  {n:"Choripán", cat:"cerdo", coc:"Plancha/Parrilla", d:""},
+  {n:"Quesadillas de pollo", cat:"pollo", coc:"Plancha/Parrilla", d:""},
+];
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function loadRecipes(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  }catch(e){}
+  return DEFAULT_RECIPES.map(r => ({...r, id: uid()}));
+}
+
+function saveRecipes(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+}
+
+let recipes = loadRecipes();
+let activeCat = null;
+let activeCoc = null;
+
+// ---------- Filters ----------
+function uniqueCoc(){
+  return [...new Set(recipes.map(r=>r.coc))];
+}
+
+function renderFilters(){
+  const catBox = document.getElementById('catFilters');
+  const cocBox = document.getElementById('cocFilters');
+  catBox.innerHTML = '';
+  cocBox.innerHTML = '';
+
+  catBox.appendChild(chip('Todas las proteínas', activeCat===null, ()=>{activeCat=null;render();}));
+  Object.keys(CAT_LABELS).forEach(c=>{
+    catBox.appendChild(chip(CAT_LABELS[c], activeCat===c, ()=>{activeCat = activeCat===c?null:c; render();}));
+  });
+
+  cocBox.appendChild(chip('Todas las cocciones', activeCoc===null, ()=>{activeCoc=null;render();}));
+  uniqueCoc().forEach(c=>{
+    cocBox.appendChild(chip(c, activeCoc===c, ()=>{activeCoc = activeCoc===c?null:c; render();}));
+  });
+}
+
+function chip(label, active, onClick){
+  const el = document.createElement('div');
+  el.className = 'chip' + (active?' active':'');
+  el.textContent = label;
+  el.onclick = onClick;
+  return el;
+}
+
+// ---------- Render list ----------
+function render(){
+  renderFilters();
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  const filtered = recipes.filter(r=>{
+    if(activeCat && r.cat !== activeCat) return false;
+    if(activeCoc && r.coc !== activeCoc) return false;
+    if(q && !r.n.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  document.getElementById('count').textContent = `${filtered.length} de ${recipes.length} comidas`;
+  document.getElementById('emptyMsg').style.display = filtered.length ? 'none' : 'block';
+
+  filtered.forEach((r) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.id = r.id;
+    card.innerHTML = `
+      <div class="card-actions">
+        <button class="icon-btn" title="Editar" onclick="startEdit('${r.id}')">✎</button>
+        <button class="icon-btn" title="Quitar" onclick="removeRecipe('${r.id}')">✕</button>
+      </div>
+      <h3>${escapeHtml(r.n)}</h3>
+      <div class="tags">
+        <span class="tag ${r.cat}">${CAT_LABELS[r.cat]}</span>
+        <span class="tag coc">${escapeHtml(r.coc)}</span>
+      </div>
+      ${r.d ? `<p class="extra">${escapeHtml(r.d)}</p>` : ''}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ---------- Add / edit form ----------
+const form = document.getElementById('addForm');
+const submitBtn = document.getElementById('submitBtn');
+const cancelEditBtn = document.getElementById('cancelEdit');
+const formTitle = document.getElementById('formTitle');
+
+function startEdit(id){
+  const r = recipes.find(x=>x.id===id);
+  if(!r) return;
+  document.getElementById('editingId').value = id;
+  document.getElementById('nombre').value = r.n;
+  document.getElementById('categoria').value = r.cat;
+  document.getElementById('coccion').value = r.coc;
+  document.getElementById('detalle').value = r.d || '';
+  submitBtn.textContent = 'Guardar cambios';
+  cancelEditBtn.style.display = 'inline-block';
+  formTitle.textContent = `Editando: ${r.n}`;
+  form.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function resetForm(){
+  document.getElementById('editingId').value = '';
+  form.reset();
+  submitBtn.textContent = '+ Agregar a la lista';
+  cancelEditBtn.style.display = 'none';
+  formTitle.textContent = 'Agregar comida o receta';
+}
+
+cancelEditBtn.addEventListener('click', resetForm);
+
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  const nombre = document.getElementById('nombre').value.trim();
+  const cat = document.getElementById('categoria').value;
+  const coc = document.getElementById('coccion').value;
+  const detalle = document.getElementById('detalle').value.trim();
+  if(!nombre) return;
+
+  const editingId = document.getElementById('editingId').value;
+  if(editingId){
+    const r = recipes.find(x=>x.id===editingId);
+    if(r){ r.n = nombre; r.cat = cat; r.coc = coc; r.d = detalle; }
+  } else {
+    recipes.unshift({id:uid(), n:nombre, cat, coc, d:detalle});
+  }
+  saveRecipes();
+  resetForm();
+  render();
+});
+
+function removeRecipe(id){
+  recipes = recipes.filter(r=>r.id!==id);
+  saveRecipes();
+  render();
+}
+
+document.getElementById('search').addEventListener('input', render);
+
+// ---------- Random pick ----------
+document.getElementById('randomBtn').addEventListener('click', ()=>{
+  if(!recipes.length){
+    showAiResult(`<p>Todavía no hay comidas cargadas para elegir.</p>`);
+    return;
+  }
+  const pick = recipes[Math.floor(Math.random() * recipes.length)];
+  showAiResult(`
+    <div class="ai-result">
+      <h3>🎲 Hoy toca: ${escapeHtml(pick.n)}</h3>
+      <div class="tags">
+        <span class="tag ${pick.cat}">${CAT_LABELS[pick.cat]}</span>
+        <span class="tag coc">${escapeHtml(pick.coc)}</span>
+      </div>
+      ${pick.d ? `<p class="extra">${escapeHtml(pick.d)}</p>` : ''}
+      <div class="btn-row">
+        <button class="btn-secondary" type="button" onclick="document.getElementById('randomBtn').click()">Tirar de nuevo</button>
+      </div>
+    </div>
+  `);
+});
+
+function showAiResult(html){
+  document.getElementById('aiResult').innerHTML = html;
+}
+
+// ---------- Invent recipe with AI ----------
+document.getElementById('inventBtn').addEventListener('click', async ()=>{
+  showAiResult(`<div class="ai-result"><p><span class="spinner"></span>Pensando una receta nueva...</p></div>`);
+
+  try{
+    const texto = await callBackend();
+    const parsed = extractJson(texto);
+    if(!parsed || !parsed.nombre){
+      throw new Error('La IA no devolvió un formato entendible. Probá de nuevo.');
+    }
+    renderAiSuggestion(parsed);
+  }catch(err){
+    showAiResult(`
+      <div class="ai-result">
+        <p><strong>No se pudo generar la receta.</strong></p>
+        <p class="small">${escapeHtml(err.message || String(err))}</p>
+      </div>
+    `);
+  }
+});
+
+async function callBackend(){
+  const res = await fetch('/api/recetario', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ recetas: recipes.map(r => `${r.n} (${r.coc})`) })
+  });
+  if(!res.ok){
+    const t = await res.text();
+    throw new Error(`El servidor respondió ${res.status}: ${t.slice(0,200)}`);
+  }
+  const json = await res.json();
+  return json.texto || '';
+}
+
+function extractJson(text){
+  if(!text) return null;
+  let cleaned = text.trim().replace(/^```(json)?/i,'').replace(/```$/,'').trim();
+  try{
+    return JSON.parse(cleaned);
+  }catch(e){
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if(match){
+      try{ return JSON.parse(match[0]); }catch(e2){ return null; }
+    }
+    return null;
+  }
+}
+
+function renderAiSuggestion(sug){
+  const cat = ['carne','pollo','cerdo','relleno'].includes(sug.categoria) ? sug.categoria : 'relleno';
+  const coc = sug.coccion || 'Horno';
+  window.__lastSuggestion = {id:uid(), n:sug.nombre, cat, coc, d: sug.ingredientes || ''};
+  showAiResult(`
+    <div class="ai-result">
+      <h3>✨ ${escapeHtml(sug.nombre)}</h3>
+      <div class="tags">
+        <span class="tag ${cat}">${CAT_LABELS[cat]}</span>
+        <span class="tag coc">${escapeHtml(coc)}</span>
+      </div>
+      ${sug.ingredientes ? `<p class="extra"><strong>Ingredientes:</strong> ${escapeHtml(sug.ingredientes)}</p>` : ''}
+      ${sug.preparacion ? `<p class="extra"><strong>Preparación:</strong> ${escapeHtml(sug.preparacion)}</p>` : ''}
+      <div class="btn-row">
+        <button class="btn-primary" type="button" onclick="acceptSuggestion()">+ Agregar a mi recetario</button>
+        <button class="btn-secondary" type="button" onclick="document.getElementById('inventBtn').click()">Probar otra</button>
+      </div>
+    </div>
+  `);
+}
+
+function acceptSuggestion(){
+  if(!window.__lastSuggestion) return;
+  recipes.unshift(window.__lastSuggestion);
+  saveRecipes();
+  window.__lastSuggestion = null;
+  showAiResult(`<div class="ai-result"><p>Agregada a la lista ✅</p></div>`);
+  render();
+}
+
+// ---------- Export / import ----------
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(recipes, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'recetario-backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      if(Array.isArray(parsed)){
+        recipes = parsed.map(r => ({id: r.id || uid(), n:r.n||'Sin nombre', cat:r.cat||'relleno', coc:r.coc||'Horno', d:r.d||''}));
+        saveRecipes();
+        render();
+      }
+    }catch(err){
+      alert('El archivo no es un backup válido.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+render();
+</script>
+</body>
+</html>
