@@ -8,3 +8,4 @@ https://www.thalmorcoding.com.ar/* https://thalmorcoding.ar/:splat 301!
 
 /api/recetario /.netlify/functions/recetario 200
 /api/recetas /.netlify/functions/recetas 200
+/api/historial /.netlify/functions/historial 200

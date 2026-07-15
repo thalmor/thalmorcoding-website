@@ -128,7 +128,7 @@
     position:relative;
   }
   .card.highlight{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);}
-  .card h3{margin:0;font-size:1rem;padding-right:50px;}
+  .card h3{margin:0;font-size:1rem;padding-right:75px;}
   .tags{display:flex;gap:6px;flex-wrap:wrap;}
   .tag{font-size:0.7rem;padding:3px 8px;border-radius:999px;font-weight:600;}
   .tag.carne{background:var(--tag-carne);color:var(--tag-carne-text);}
@@ -145,6 +145,8 @@
   .card p.extra{margin:4px 0 0;font-size:0.85rem;color:var(--muted);white-space:pre-wrap;}
   .card p.extra a{color:var(--accent);text-decoration:none;font-weight:600;}
   .card p.extra a:hover{text-decoration:underline;}
+  .log-form{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);display:flex;flex-direction:column;gap:8px;}
+  .log-form .row > *{min-width:0;}
 
   .empty{color:var(--muted);font-size:0.9rem;text-align:center;padding:30px 0;}
 
@@ -328,7 +330,48 @@ function isSafeUrl(url){
   return /^https?:\/\//i.test(url);
 }
 
+const DIAS_SIN_REPETIR = 3;
+
+function todayStr(){
+  const d = new Date();
+  const tz = d.getTimezoneOffset() * 60000;
+  return new Date(d - tz).toISOString().slice(0, 10);
+}
+
+function defaultComida(){
+  return new Date().getHours() < 16 ? 'Almuerzo' : 'Cena';
+}
+
+function diasDesde(fechaStr){
+  const hoy = new Date(todayStr() + 'T00:00:00');
+  const f = new Date(fechaStr + 'T00:00:00');
+  return Math.round((hoy - f) / 86400000);
+}
+
+function comidoRecientemente(id){
+  return historial.some(h => h.recipeId === id && diasDesde(h.fecha) >= 0 && diasDesde(h.fecha) <= DIAS_SIN_REPETIR);
+}
+
+function ultimaVez(id){
+  const entradas = historial.filter(h => h.recipeId === id);
+  if(!entradas.length) return null;
+  return entradas.reduce((a, b) => (a.fecha > b.fecha ? a : b));
+}
+
+function lastEatenLabel(id){
+  const ultima = ultimaVez(id);
+  if(!ultima) return '';
+  const dias = diasDesde(ultima.fecha);
+  let cuando;
+  if(dias === 0) cuando = 'hoy';
+  else if(dias === 1) cuando = 'ayer';
+  else if(dias > 1) cuando = `hace ${dias} días`;
+  else cuando = ultima.fecha;
+  return `<p class="extra">🍽️ Comimos esto ${cuando} (${escapeHtml(ultima.comida)})</p>`;
+}
+
 let recipes = [];
+let historial = [];
 
 // ---------- Backend + PIN gate ----------
 const gate = document.getElementById('pinGate');
@@ -367,6 +410,44 @@ async function persistRecipes(){
 async function saveRecipes(){
   try{
     await persistRecipes();
+    hideSaveError();
+  }catch(err){
+    if(err.code === 401){
+      PIN = '';
+      localStorage.removeItem(PIN_KEY);
+      showGate('El código ya no es válido, volvé a ingresarlo.');
+    } else {
+      showSaveError('No se pudo guardar en el servidor: ' + err.message);
+    }
+  }
+}
+
+async function fetchHistorial(){
+  const res = await fetch('/api/historial', { headers: apiHeaders() });
+  if(!res.ok){
+    const err = new Error(res.status === 401 ? 'Código incorrecto.' : `Error del servidor (${res.status}).`);
+    err.code = res.status;
+    throw err;
+  }
+  return res.json();
+}
+
+async function persistHistorial(){
+  const res = await fetch('/api/historial', {
+    method: 'POST',
+    headers: apiHeaders(),
+    body: JSON.stringify({ historial })
+  });
+  if(!res.ok){
+    const err = new Error(res.status === 401 ? 'Código incorrecto.' : `Error del servidor (${res.status}).`);
+    err.code = res.status;
+    throw err;
+  }
+}
+
+async function saveHistorial(){
+  try{
+    await persistHistorial();
     hideSaveError();
   }catch(err){
     if(err.code === 401){
@@ -419,9 +500,10 @@ async function tryPin(){
   pinSubmitBtn.disabled = true;
   pinSubmitBtn.textContent = 'Entrando...';
   try{
-    const data = await fetchRecipes();
+    const [data, histData] = await Promise.all([fetchRecipes(), fetchHistorial()]);
     localStorage.setItem(PIN_KEY, PIN);
     await applyLoadedData(data);
+    historial = Array.isArray(histData.historial) ? histData.historial : [];
     hideGate();
     render();
   }catch(err){
@@ -443,8 +525,9 @@ async function boot(){
     return;
   }
   try{
-    const data = await fetchRecipes();
+    const [data, histData] = await Promise.all([fetchRecipes(), fetchHistorial()]);
     await applyLoadedData(data);
+    historial = Array.isArray(histData.historial) ? histData.historial : [];
     hideGate();
     render();
   }catch(err){
@@ -468,6 +551,7 @@ function render(){
     card.dataset.id = r.id;
     card.innerHTML = `
       <div class="card-actions">
+        <button class="icon-btn" title="Anotar que comimos esto" onclick="toggleLog('${r.id}')">📅</button>
         <button class="icon-btn" title="Editar" onclick="startEdit('${r.id}')">✎</button>
         <button class="icon-btn" title="Quitar" onclick="removeRecipe('${r.id}')">✕</button>
       </div>
@@ -479,6 +563,26 @@ function render(){
       ${r.ingredientes ? `<p class="extra"><strong>Ingredientes:</strong> ${escapeHtml(r.ingredientes)}</p>` : ''}
       ${r.preparacion ? `<p class="extra"><strong>Cómo se hace:</strong> ${escapeHtml(r.preparacion)}</p>` : ''}
       ${r.link && isSafeUrl(r.link) ? `<p class="extra"><a href="${escapeHtml(r.link)}" target="_blank" rel="noopener noreferrer">🔗 Ver receta</a></p>` : ''}
+      ${lastEatenLabel(r.id)}
+      <div class="log-form" id="logForm-${r.id}" style="display:none;">
+        <div class="row">
+          <div>
+            <label for="logFecha-${r.id}">Fecha</label>
+            <input type="date" id="logFecha-${r.id}" value="${todayStr()}">
+          </div>
+          <div>
+            <label for="logComida-${r.id}">Comida</label>
+            <select id="logComida-${r.id}">
+              <option value="Almuerzo" ${defaultComida()==='Almuerzo'?'selected':''}>Almuerzo</option>
+              <option value="Cena" ${defaultComida()==='Cena'?'selected':''}>Cena</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" type="button" onclick="confirmLog('${r.id}')">Guardar</button>
+          <button class="btn-secondary" type="button" onclick="toggleLog('${r.id}')">Cancelar</button>
+        </div>
+      </div>
     `;
     grid.appendChild(card);
   });
@@ -548,13 +652,36 @@ async function removeRecipe(id){
   await saveRecipes();
 }
 
+function toggleLog(id){
+  const el = document.getElementById('logForm-' + id);
+  if(!el) return;
+  const opening = el.style.display === 'none';
+  document.querySelectorAll('.log-form').forEach(f => f.style.display = 'none');
+  el.style.display = opening ? 'flex' : 'none';
+}
+
+async function confirmLog(id){
+  const fecha = document.getElementById('logFecha-' + id).value;
+  const comida = document.getElementById('logComida-' + id).value;
+  if(!fecha) return;
+  historial.push({ recipeId: id, fecha, comida });
+  render();
+  await saveHistorial();
+}
+
 // ---------- Random pick ----------
 document.getElementById('randomBtn').addEventListener('click', ()=>{
   if(!recipes.length){
     showAiResult(`<p>Todavía no hay comidas cargadas para elegir.</p>`);
     return;
   }
-  const pick = recipes[Math.floor(Math.random() * recipes.length)];
+  let candidatos = recipes.filter(r => !comidoRecientemente(r.id));
+  let repetido = false;
+  if(!candidatos.length){
+    candidatos = recipes;
+    repetido = true;
+  }
+  const pick = candidatos[Math.floor(Math.random() * candidatos.length)];
   showAiResult(`
     <div class="ai-result">
       <h3>🎲 Hoy toca: ${escapeHtml(pick.n)}</h3>
@@ -565,6 +692,7 @@ document.getElementById('randomBtn').addEventListener('click', ()=>{
       ${pick.ingredientes ? `<p class="extra"><strong>Ingredientes:</strong> ${escapeHtml(pick.ingredientes)}</p>` : ''}
       ${pick.preparacion ? `<p class="extra"><strong>Cómo se hace:</strong> ${escapeHtml(pick.preparacion)}</p>` : ''}
       ${pick.link && isSafeUrl(pick.link) ? `<p class="extra"><a href="${escapeHtml(pick.link)}" target="_blank" rel="noopener noreferrer">🔗 Ver receta</a></p>` : ''}
+      ${repetido ? `<p class="small">Ya comieron todo lo demás en los últimos ${DIAS_SIN_REPETIR} días, así que puede repetirse.</p>` : ''}
       <div class="btn-row">
         <button class="btn-secondary" type="button" onclick="document.getElementById('randomBtn').click()">Tirar de nuevo</button>
       </div>

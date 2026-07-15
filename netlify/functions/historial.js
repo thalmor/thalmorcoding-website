@@ -8,24 +8,24 @@ exports.handler = async (event) => {
   const store = getRecetarioStore("recetario");
 
   if (event.httpMethod === "GET") {
-    const data = await store.get("recipes", { type: "json" });
+    const data = await store.get("historial", { type: "json" });
     return {
       statusCode: 200,
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ recetas: data || null }),
+      body: JSON.stringify({ historial: data || [] }),
     };
   }
 
   if (event.httpMethod === "POST") {
-    let recetas;
+    let historial;
     try {
       const body = JSON.parse(event.body || "{}");
-      recetas = body.recetas;
-      if (!Array.isArray(recetas)) throw new Error("recetas debe ser un array");
+      historial = body.historial;
+      if (!Array.isArray(historial)) throw new Error("historial debe ser un array");
     } catch {
       return { statusCode: 400, body: JSON.stringify({ error: "Body inválido" }) };
     }
-    await store.setJSON("recipes", recetas);
+    await store.setJSON("historial", historial);
     return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   }
 
