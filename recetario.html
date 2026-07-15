@@ -143,6 +143,8 @@
   }
   .icon-btn:hover{color:var(--accent);}
   .card p.extra{margin:4px 0 0;font-size:0.85rem;color:var(--muted);white-space:pre-wrap;}
+  .card p.extra a{color:var(--accent);text-decoration:none;font-weight:600;}
+  .card p.extra a:hover{text-decoration:underline;}
 
   .empty{color:var(--muted);font-size:0.9rem;text-align:center;padding:30px 0;}
 
@@ -246,6 +248,12 @@
           <textarea id="preparacion" rows="3" placeholder="Pasos para prepararla..."></textarea>
         </div>
       </div>
+      <div class="row">
+        <div>
+          <label for="link">Link de la receta (opcional)</label>
+          <input type="url" id="link" placeholder="https://...">
+        </div>
+      </div>
       <div class="btn-row">
         <button type="submit" class="btn-primary" id="submitBtn">+ Agregar a la lista</button>
         <button type="button" class="btn-secondary" id="cancelEdit" style="display:none;">Cancelar edición</button>
@@ -312,7 +320,12 @@ function normalizeRecipe(r){
     coc: r.coc || 'Horno',
     ingredientes: r.ingredientes !== undefined ? r.ingredientes : (r.d || ''),
     preparacion: r.preparacion || '',
+    link: r.link || '',
   };
+}
+
+function isSafeUrl(url){
+  return /^https?:\/\//i.test(url);
 }
 
 let recipes = [];
@@ -465,6 +478,7 @@ function render(){
       </div>
       ${r.ingredientes ? `<p class="extra"><strong>Ingredientes:</strong> ${escapeHtml(r.ingredientes)}</p>` : ''}
       ${r.preparacion ? `<p class="extra"><strong>Cómo se hace:</strong> ${escapeHtml(r.preparacion)}</p>` : ''}
+      ${r.link && isSafeUrl(r.link) ? `<p class="extra"><a href="${escapeHtml(r.link)}" target="_blank" rel="noopener noreferrer">🔗 Ver receta</a></p>` : ''}
     `;
     grid.appendChild(card);
   });
@@ -489,6 +503,7 @@ function startEdit(id){
   document.getElementById('coccion').value = r.coc;
   document.getElementById('ingredientes').value = r.ingredientes || '';
   document.getElementById('preparacion').value = r.preparacion || '';
+  document.getElementById('link').value = r.link || '';
   submitBtn.textContent = 'Guardar cambios';
   cancelEditBtn.style.display = 'inline-block';
   formTitle.textContent = `Editando: ${r.n}`;
@@ -512,14 +527,15 @@ form.addEventListener('submit', async function(e){
   const coc = document.getElementById('coccion').value;
   const ingredientes = document.getElementById('ingredientes').value.trim();
   const preparacion = document.getElementById('preparacion').value.trim();
+  const link = document.getElementById('link').value.trim();
   if(!nombre) return;
 
   const editingId = document.getElementById('editingId').value;
   if(editingId){
     const r = recipes.find(x=>x.id===editingId);
-    if(r){ r.n = nombre; r.cat = cat; r.coc = coc; r.ingredientes = ingredientes; r.preparacion = preparacion; }
+    if(r){ r.n = nombre; r.cat = cat; r.coc = coc; r.ingredientes = ingredientes; r.preparacion = preparacion; r.link = link; }
   } else {
-    recipes.unshift({id:uid(), n:nombre, cat, coc, ingredientes, preparacion});
+    recipes.unshift({id:uid(), n:nombre, cat, coc, ingredientes, preparacion, link});
   }
   resetForm();
   render();
@@ -548,6 +564,7 @@ document.getElementById('randomBtn').addEventListener('click', ()=>{
       </div>
       ${pick.ingredientes ? `<p class="extra"><strong>Ingredientes:</strong> ${escapeHtml(pick.ingredientes)}</p>` : ''}
       ${pick.preparacion ? `<p class="extra"><strong>Cómo se hace:</strong> ${escapeHtml(pick.preparacion)}</p>` : ''}
+      ${pick.link && isSafeUrl(pick.link) ? `<p class="extra"><a href="${escapeHtml(pick.link)}" target="_blank" rel="noopener noreferrer">🔗 Ver receta</a></p>` : ''}
       <div class="btn-row">
         <button class="btn-secondary" type="button" onclick="document.getElementById('randomBtn').click()">Tirar de nuevo</button>
       </div>
