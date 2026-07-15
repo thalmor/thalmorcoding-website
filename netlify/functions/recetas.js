@@ -1,11 +1,20 @@
 const { getStore } = require("@netlify/blobs");
 const { checkPin } = require("./_pin");
 
+function getRecetarioStore() {
+  const siteID = process.env.NETLIFY_SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN;
+  if (siteID && token) {
+    return getStore({ name: "recetario", siteID, token });
+  }
+  return getStore("recetario");
+}
+
 exports.handler = async (event) => {
   const pinCheck = checkPin(event);
   if (!pinCheck.ok) return pinCheck.response;
 
-  const store = getStore("recetario");
+  const store = getRecetarioStore();
 
   if (event.httpMethod === "GET") {
     const data = await store.get("recipes", { type: "json" });
