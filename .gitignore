@@ -3,4 +3,3 @@
 
 # Function dependencies (installed by Netlify at deploy time)
 netlify/functions/node_modules
-netlify/functions/package-lock.json
