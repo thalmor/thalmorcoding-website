@@ -113,21 +113,6 @@
   .btn-ghost{background:var(--accent-soft);color:var(--accent);}
   .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
 
-  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
-  .chip{
-    padding:6px 12px;
-    border-radius:999px;
-    border:1px solid var(--border);
-    background:var(--card);
-    color:var(--muted);
-    font-size:0.82rem;
-    cursor:pointer;
-    user-select:none;
-  }
-  .chip.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-
-  #search{margin-bottom:14px;}
-
   .grid{display:grid;grid-template-columns:1fr;gap:10px;}
   @media(min-width:560px){.grid{grid-template-columns:1fr 1fr;}}
 
@@ -277,22 +262,9 @@
     <div id="aiResult"></div>
   </div>
 
-  <div class="panel">
-    <h2>Filtrar</h2>
-    <input type="text" id="search" placeholder="Buscar por nombre...">
-    <div class="filters" id="catFilters"></div>
-    <div class="filters" id="cocFilters"></div>
-  </div>
-
-  <div class="btn-row" style="margin-bottom:10px;">
-    <button class="btn-secondary" id="exportBtn" type="button">⬇️ Exportar backup</button>
-    <button class="btn-secondary" id="importBtn" type="button">⬆️ Importar backup</button>
-    <input type="file" id="importFile" accept="application/json" style="display:none;">
-  </div>
-
   <p class="count" id="count"></p>
   <div class="grid" id="grid"></div>
-  <div class="empty" id="emptyMsg" style="display:none;">No hay comidas que coincidan con el filtro.</div>
+  <div class="empty" id="emptyMsg" style="display:none;">Todavía no hay comidas cargadas.</div>
 </div>
 
 <script>
@@ -344,8 +316,6 @@ function normalizeRecipe(r){
 }
 
 let recipes = [];
-let activeCat = null;
-let activeCoc = null;
 
 // ---------- Backend + PIN gate ----------
 const gate = document.getElementById('pinGate');
@@ -471,54 +441,15 @@ async function boot(){
   }
 }
 
-// ---------- Filters ----------
-function uniqueCoc(){
-  return [...new Set(recipes.map(r=>r.coc))];
-}
-
-function renderFilters(){
-  const catBox = document.getElementById('catFilters');
-  const cocBox = document.getElementById('cocFilters');
-  catBox.innerHTML = '';
-  cocBox.innerHTML = '';
-
-  catBox.appendChild(chip('Todas las proteínas', activeCat===null, ()=>{activeCat=null;render();}));
-  Object.keys(CAT_LABELS).forEach(c=>{
-    catBox.appendChild(chip(CAT_LABELS[c], activeCat===c, ()=>{activeCat = activeCat===c?null:c; render();}));
-  });
-
-  cocBox.appendChild(chip('Todas las cocciones', activeCoc===null, ()=>{activeCoc=null;render();}));
-  uniqueCoc().forEach(c=>{
-    cocBox.appendChild(chip(c, activeCoc===c, ()=>{activeCoc = activeCoc===c?null:c; render();}));
-  });
-}
-
-function chip(label, active, onClick){
-  const el = document.createElement('div');
-  el.className = 'chip' + (active?' active':'');
-  el.textContent = label;
-  el.onclick = onClick;
-  return el;
-}
-
 // ---------- Render list ----------
 function render(){
-  renderFilters();
-  const q = document.getElementById('search').value.trim().toLowerCase();
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
 
-  const filtered = recipes.filter(r=>{
-    if(activeCat && r.cat !== activeCat) return false;
-    if(activeCoc && r.coc !== activeCoc) return false;
-    if(q && !r.n.toLowerCase().includes(q)) return false;
-    return true;
-  });
+  document.getElementById('count').textContent = `${recipes.length} comidas`;
+  document.getElementById('emptyMsg').style.display = recipes.length ? 'none' : 'block';
 
-  document.getElementById('count').textContent = `${filtered.length} de ${recipes.length} comidas`;
-  document.getElementById('emptyMsg').style.display = filtered.length ? 'none' : 'block';
-
-  filtered.forEach((r) => {
+  recipes.forEach((r) => {
     const card = document.createElement('div');
     card.className = 'card';
     card.dataset.id = r.id;
@@ -600,8 +531,6 @@ async function removeRecipe(id){
   render();
   await saveRecipes();
 }
-
-document.getElementById('search').addEventListener('input', render);
 
 // ---------- Random pick ----------
 document.getElementById('randomBtn').addEventListener('click', ()=>{
@@ -708,41 +637,6 @@ async function acceptSuggestion(){
   render();
   await saveRecipes();
 }
-
-// ---------- Export / import ----------
-document.getElementById('exportBtn').addEventListener('click', ()=>{
-  const blob = new Blob([JSON.stringify(recipes, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'recetario-backup.json';
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-document.getElementById('importBtn').addEventListener('click', ()=>{
-  document.getElementById('importFile').click();
-});
-
-document.getElementById('importFile').addEventListener('change', (e)=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = async () => {
-    try{
-      const parsed = JSON.parse(reader.result);
-      if(Array.isArray(parsed)){
-        recipes = parsed.map(r => normalizeRecipe({...r, n: r.n || 'Sin nombre'}));
-        render();
-        await saveRecipes();
-      }
-    }catch(err){
-      alert('El archivo no es un backup válido.');
-    }
-  };
-  reader.readAsText(file);
-  e.target.value = '';
-});
 
 boot();
 </script>
