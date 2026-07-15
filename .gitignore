@@ -1,5 +1,5 @@
 # Local Netlify folder
 .netlify
 
-# Function dependencies (installed by Netlify at deploy time)
-netlify/functions/node_modules
+# Dependencies (installed by Netlify at deploy time; package-lock.json is committed)
+node_modules
