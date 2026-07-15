@@ -1,7 +1,12 @@
+const { checkPin } = require("./_pin");
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
+
+  const pinCheck = checkPin(event);
+  if (!pinCheck.ok) return pinCheck.response;
 
   let recetas = [];
   try {

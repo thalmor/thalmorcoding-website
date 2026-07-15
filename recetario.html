@@ -52,6 +52,30 @@
   .back{display:inline-block;margin-bottom:10px;color:var(--accent);font-size:0.85rem;text-decoration:none;}
   .back:hover{text-decoration:underline;}
 
+  #pinGate{
+    position:fixed;
+    inset:0;
+    background:var(--bg);
+    z-index:50;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .pin-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:24px;
+    max-width:320px;
+    width:100%;
+    text-align:center;
+  }
+  .pin-box h2{margin:0 0 8px;font-size:1.2rem;}
+  .pin-box input{margin:14px 0 10px;text-align:center;letter-spacing:2px;}
+  #app{display:none;}
+
   .panel{
     background:var(--card);
     border:1px solid var(--border);
@@ -66,7 +90,7 @@
   .row{display:flex;gap:10px;flex-wrap:wrap;}
   .row > *{flex:1;min-width:140px;}
   label{font-size:0.78rem;color:var(--muted);display:block;margin-bottom:4px;}
-  input[type=text], select, textarea{
+  input[type=text], input[type=password], select, textarea{
     width:100%;
     padding:9px 10px;
     border-radius:9px;
@@ -135,7 +159,7 @@
     font-size:0.9rem;padding:3px 6px;border-radius:6px;
   }
   .icon-btn:hover{color:var(--accent);}
-  .card p.extra{margin:4px 0 0;font-size:0.85rem;color:var(--muted);}
+  .card p.extra{margin:4px 0 0;font-size:0.85rem;color:var(--muted);white-space:pre-wrap;}
 
   .empty{color:var(--muted);font-size:0.9rem;text-align:center;padding:30px 0;}
 
@@ -146,6 +170,14 @@
     border-radius:10px;
     padding:10px 12px;
     margin-top:6px;
+  }
+  .warn{
+    font-size:0.8rem;
+    color:var(--warn-text);
+    background:var(--warn-bg);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:14px;
   }
   .count{color:var(--muted);font-size:0.85rem;margin-bottom:10px;}
 
@@ -169,12 +201,25 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<div id="pinGate">
+  <div class="pin-box">
+    <h2>🔒 Recetario familiar</h2>
+    <p class="small">Ingresá el código para ver y editar las recetas.</p>
+    <input type="password" id="pinInput" placeholder="Código" inputmode="numeric" autocomplete="off">
+    <button class="btn-primary" id="pinSubmit" type="button" style="width:100%;">Entrar</button>
+    <p class="small" id="pinError" style="display:none;color:var(--warn-text);margin-top:10px;"></p>
+  </div>
+</div>
+
+<div class="wrap" id="app">
   <a href="/" class="back">← Volver a ThalmorCoding</a>
   <header>
     <h1>🍽️ Recetario de casa</h1>
-    <p class="sub">Se guarda en este navegador. Agregá, editá, sorteá o inventá algo nuevo con IA.</p>
+    <p class="sub">Compartido para toda la familia. Agregá, editá, sorteá o inventá algo nuevo con IA.</p>
   </header>
+
+  <div id="saveError" class="warn" style="display:none;"></div>
 
   <div class="panel">
     <h2 id="formTitle">Agregar comida o receta</h2>
@@ -209,8 +254,14 @@
       </div>
       <div class="row">
         <div>
-          <label for="detalle">Ingredientes / notas (opcional)</label>
-          <input type="text" id="detalle" placeholder="Ej: pechuga, mostaza, crema">
+          <label for="ingredientes">Ingredientes (opcional)</label>
+          <textarea id="ingredientes" rows="2" placeholder="Ej: pechuga, mostaza, crema"></textarea>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="preparacion">Cómo se hace (opcional)</label>
+          <textarea id="preparacion" rows="3" placeholder="Pasos para prepararla..."></textarea>
         </div>
       </div>
       <div class="btn-row">
@@ -249,58 +300,179 @@
 
 <script>
 const CAT_LABELS = {carne:"Carne vacuna", pollo:"Pollo", cerdo:"Cerdo / embutidos", relleno:"Relleno / masa"};
-const STORAGE_KEY = 'recetario_recipes_v1';
+const PIN_KEY = 'recetario_pin';
+let PIN = localStorage.getItem(PIN_KEY) || '';
 
 const DEFAULT_RECIPES = [
-  {n:"Matambre", cat:"carne", coc:"Plancha/Parrilla", d:""},
-  {n:"Pizza", cat:"relleno", coc:"Horno", d:""},
-  {n:"Milanesa", cat:"carne", coc:"Frito", d:""},
-  {n:"Hamburguesa", cat:"carne", coc:"Plancha/Parrilla", d:""},
-  {n:"Zapallito relleno", cat:"relleno", coc:"Relleno al horno", d:""},
-  {n:"Carne al horno", cat:"carne", coc:"Horno", d:""},
-  {n:"Tacos", cat:"relleno", coc:"Hervido/Guisado", d:""},
-  {n:"Tarteletitas de pollo", cat:"pollo", coc:"Horno", d:""},
-  {n:"Salchichas con panceta", cat:"cerdo", coc:"Plancha/Parrilla", d:""},
-  {n:"Arroz con pollo", cat:"pollo", coc:"Hervido/Guisado", d:""},
-  {n:"Bife con papas y cebolla", cat:"carne", coc:"Plancha/Parrilla", d:""},
-  {n:"Tarta", cat:"relleno", coc:"Horno", d:""},
-  {n:"Lasaña", cat:"relleno", coc:"Horno", d:""},
-  {n:"Empanadas", cat:"relleno", coc:"Horno", d:""},
-  {n:"Bondiola", cat:"cerdo", coc:"Horno", d:""},
-  {n:"Panchos", cat:"cerdo", coc:"Hervido/Guisado", d:""},
-  {n:"Pollo frito", cat:"pollo", coc:"Frito", d:""},
-  {n:"Nuggets", cat:"pollo", coc:"Frito", d:""},
-  {n:"Pechuga a la plancha", cat:"pollo", coc:"Plancha/Parrilla", d:""},
-  {n:"Pastel de papas", cat:"carne", coc:"Horno", d:""},
-  {n:"Canelones", cat:"relleno", coc:"Horno", d:""},
-  {n:"Suprema a la parmesana", cat:"pollo", coc:"Frito", d:""},
-  {n:"Berenjenas rellenas", cat:"relleno", coc:"Relleno al horno", d:""},
-  {n:"Matambrito de cerdo a la plancha", cat:"cerdo", coc:"Plancha/Parrilla", d:""},
-  {n:"Pollo al verdeo", cat:"pollo", coc:"Hervido/Guisado", d:""},
-  {n:"Choripán", cat:"cerdo", coc:"Plancha/Parrilla", d:""},
-  {n:"Quesadillas de pollo", cat:"pollo", coc:"Plancha/Parrilla", d:""},
+  {n:"Matambre", cat:"carne", coc:"Plancha/Parrilla", ingredientes:"", preparacion:""},
+  {n:"Pizza", cat:"relleno", coc:"Horno", ingredientes:"", preparacion:""},
+  {n:"Milanesa", cat:"carne", coc:"Frito", ingredientes:"", preparacion:""},
+  {n:"Hamburguesa", cat:"carne", coc:"Plancha/Parrilla", ingredientes:"", preparacion:""},
+  {n:"Zapallito relleno", cat:"relleno", coc:"Relleno al horno", ingredientes:"", preparacion:""},
+  {n:"Carne al horno", cat:"carne", coc:"Horno", ingredientes:"", preparacion:""},
+  {n:"Tacos", cat:"relleno", coc:"Hervido/Guisado", ingredientes:"", preparacion:""},
+  {n:"Tarteletitas de pollo", cat:"pollo", coc:"Horno", ingredientes:"", preparacion:""},
+  {n:"Salchichas con panceta", cat:"cerdo", coc:"Plancha/Parrilla", ingredientes:"", preparacion:""},
+  {n:"Arroz con pollo", cat:"pollo", coc:"Hervido/Guisado", ingredientes:"", preparacion:""},
+  {n:"Bife con papas y cebolla", cat:"carne", coc:"Plancha/Parrilla", ingredientes:"", preparacion:""},
+  {n:"Tarta", cat:"relleno", coc:"Horno", ingredientes:"", preparacion:""},
+  {n:"Lasaña", cat:"relleno", coc:"Horno", ingredientes:"", preparacion:""},
+  {n:"Empanadas", cat:"relleno", coc:"Horno", ingredientes:"", preparacion:""},
+  {n:"Bondiola", cat:"cerdo", coc:"Horno", ingredientes:"", preparacion:""},
+  {n:"Panchos", cat:"cerdo", coc:"Hervido/Guisado", ingredientes:"", preparacion:""},
+  {n:"Pollo frito", cat:"pollo", coc:"Frito", ingredientes:"", preparacion:""},
+  {n:"Nuggets", cat:"pollo", coc:"Frito", ingredientes:"", preparacion:""},
+  {n:"Pechuga a la plancha", cat:"pollo", coc:"Plancha/Parrilla", ingredientes:"", preparacion:""},
+  {n:"Pastel de papas", cat:"carne", coc:"Horno", ingredientes:"", preparacion:""},
+  {n:"Canelones", cat:"relleno", coc:"Horno", ingredientes:"", preparacion:""},
+  {n:"Suprema a la parmesana", cat:"pollo", coc:"Frito", ingredientes:"", preparacion:""},
+  {n:"Berenjenas rellenas", cat:"relleno", coc:"Relleno al horno", ingredientes:"", preparacion:""},
+  {n:"Matambrito de cerdo a la plancha", cat:"cerdo", coc:"Plancha/Parrilla", ingredientes:"", preparacion:""},
+  {n:"Pollo al verdeo", cat:"pollo", coc:"Hervido/Guisado", ingredientes:"", preparacion:""},
+  {n:"Choripán", cat:"cerdo", coc:"Plancha/Parrilla", ingredientes:"", preparacion:""},
+  {n:"Quesadillas de pollo", cat:"pollo", coc:"Plancha/Parrilla", ingredientes:"", preparacion:""},
 ];
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
-function loadRecipes(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){
-      const parsed = JSON.parse(raw);
-      if(Array.isArray(parsed) && parsed.length) return parsed;
-    }
-  }catch(e){}
-  return DEFAULT_RECIPES.map(r => ({...r, id: uid()}));
+function normalizeRecipe(r){
+  return {
+    id: r.id || uid(),
+    n: r.n || '',
+    cat: r.cat || 'relleno',
+    coc: r.coc || 'Horno',
+    ingredientes: r.ingredientes !== undefined ? r.ingredientes : (r.d || ''),
+    preparacion: r.preparacion || '',
+  };
 }
 
-function saveRecipes(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
-}
-
-let recipes = loadRecipes();
+let recipes = [];
 let activeCat = null;
 let activeCoc = null;
+
+// ---------- Backend + PIN gate ----------
+const gate = document.getElementById('pinGate');
+const app = document.getElementById('app');
+const pinInput = document.getElementById('pinInput');
+const pinSubmitBtn = document.getElementById('pinSubmit');
+const pinError = document.getElementById('pinError');
+
+function apiHeaders(){
+  return { 'Content-Type': 'application/json', 'x-recetario-pin': PIN };
+}
+
+async function fetchRecipes(){
+  const res = await fetch('/api/recetas', { headers: apiHeaders() });
+  if(!res.ok){
+    const err = new Error(res.status === 401 ? 'Código incorrecto.' : `Error del servidor (${res.status}).`);
+    err.code = res.status;
+    throw err;
+  }
+  return res.json();
+}
+
+async function persistRecipes(){
+  const res = await fetch('/api/recetas', {
+    method: 'POST',
+    headers: apiHeaders(),
+    body: JSON.stringify({ recetas: recipes })
+  });
+  if(!res.ok){
+    const err = new Error(res.status === 401 ? 'Código incorrecto.' : `Error del servidor (${res.status}).`);
+    err.code = res.status;
+    throw err;
+  }
+}
+
+async function saveRecipes(){
+  try{
+    await persistRecipes();
+    hideSaveError();
+  }catch(err){
+    if(err.code === 401){
+      PIN = '';
+      localStorage.removeItem(PIN_KEY);
+      showGate('El código ya no es válido, volvé a ingresarlo.');
+    } else {
+      showSaveError('No se pudo guardar en el servidor: ' + err.message);
+    }
+  }
+}
+
+function showSaveError(msg){
+  const el = document.getElementById('saveError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function hideSaveError(){
+  document.getElementById('saveError').style.display = 'none';
+}
+
+function showGate(message){
+  app.style.display = 'none';
+  gate.style.display = 'flex';
+  pinError.style.display = message ? 'block' : 'none';
+  pinError.textContent = message || '';
+  pinInput.value = '';
+  pinInput.focus();
+}
+
+function hideGate(){
+  gate.style.display = 'none';
+  app.style.display = '';
+}
+
+async function applyLoadedData(data){
+  if(data.recetas && Array.isArray(data.recetas) && data.recetas.length){
+    recipes = data.recetas.map(normalizeRecipe);
+  } else {
+    recipes = DEFAULT_RECIPES.map(r => ({...r, id: uid()}));
+    await persistRecipes();
+  }
+}
+
+async function tryPin(){
+  const value = pinInput.value.trim();
+  if(!value) return;
+  PIN = value;
+  pinSubmitBtn.disabled = true;
+  pinSubmitBtn.textContent = 'Entrando...';
+  try{
+    const data = await fetchRecipes();
+    localStorage.setItem(PIN_KEY, PIN);
+    await applyLoadedData(data);
+    hideGate();
+    render();
+  }catch(err){
+    PIN = '';
+    pinError.style.display = 'block';
+    pinError.textContent = err.code === 401 ? 'Código incorrecto.' : ('Error: ' + err.message);
+  }finally{
+    pinSubmitBtn.disabled = false;
+    pinSubmitBtn.textContent = 'Entrar';
+  }
+}
+
+pinSubmitBtn.addEventListener('click', tryPin);
+pinInput.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); tryPin(); } });
+
+async function boot(){
+  if(!PIN){
+    showGate();
+    return;
+  }
+  try{
+    const data = await fetchRecipes();
+    await applyLoadedData(data);
+    hideGate();
+    render();
+  }catch(err){
+    PIN = '';
+    localStorage.removeItem(PIN_KEY);
+    showGate(err.code === 401 ? 'El código ya no es válido, volvé a ingresarlo.' : 'No se pudo conectar. Probá de nuevo.');
+  }
+}
 
 // ---------- Filters ----------
 function uniqueCoc(){
@@ -363,7 +535,8 @@ function render(){
         <span class="tag ${r.cat}">${CAT_LABELS[r.cat]}</span>
         <span class="tag coc">${escapeHtml(r.coc)}</span>
       </div>
-      ${r.d ? `<p class="extra">${escapeHtml(r.d)}</p>` : ''}
+      ${r.ingredientes ? `<p class="extra"><strong>Ingredientes:</strong> ${escapeHtml(r.ingredientes)}</p>` : ''}
+      ${r.preparacion ? `<p class="extra"><strong>Cómo se hace:</strong> ${escapeHtml(r.preparacion)}</p>` : ''}
     `;
     grid.appendChild(card);
   });
@@ -386,7 +559,8 @@ function startEdit(id){
   document.getElementById('nombre').value = r.n;
   document.getElementById('categoria').value = r.cat;
   document.getElementById('coccion').value = r.coc;
-  document.getElementById('detalle').value = r.d || '';
+  document.getElementById('ingredientes').value = r.ingredientes || '';
+  document.getElementById('preparacion').value = r.preparacion || '';
   submitBtn.textContent = 'Guardar cambios';
   cancelEditBtn.style.display = 'inline-block';
   formTitle.textContent = `Editando: ${r.n}`;
@@ -403,30 +577,31 @@ function resetForm(){
 
 cancelEditBtn.addEventListener('click', resetForm);
 
-form.addEventListener('submit', function(e){
+form.addEventListener('submit', async function(e){
   e.preventDefault();
   const nombre = document.getElementById('nombre').value.trim();
   const cat = document.getElementById('categoria').value;
   const coc = document.getElementById('coccion').value;
-  const detalle = document.getElementById('detalle').value.trim();
+  const ingredientes = document.getElementById('ingredientes').value.trim();
+  const preparacion = document.getElementById('preparacion').value.trim();
   if(!nombre) return;
 
   const editingId = document.getElementById('editingId').value;
   if(editingId){
     const r = recipes.find(x=>x.id===editingId);
-    if(r){ r.n = nombre; r.cat = cat; r.coc = coc; r.d = detalle; }
+    if(r){ r.n = nombre; r.cat = cat; r.coc = coc; r.ingredientes = ingredientes; r.preparacion = preparacion; }
   } else {
-    recipes.unshift({id:uid(), n:nombre, cat, coc, d:detalle});
+    recipes.unshift({id:uid(), n:nombre, cat, coc, ingredientes, preparacion});
   }
-  saveRecipes();
   resetForm();
   render();
+  await saveRecipes();
 });
 
-function removeRecipe(id){
+async function removeRecipe(id){
   recipes = recipes.filter(r=>r.id!==id);
-  saveRecipes();
   render();
+  await saveRecipes();
 }
 
 document.getElementById('search').addEventListener('input', render);
@@ -445,7 +620,8 @@ document.getElementById('randomBtn').addEventListener('click', ()=>{
         <span class="tag ${pick.cat}">${CAT_LABELS[pick.cat]}</span>
         <span class="tag coc">${escapeHtml(pick.coc)}</span>
       </div>
-      ${pick.d ? `<p class="extra">${escapeHtml(pick.d)}</p>` : ''}
+      ${pick.ingredientes ? `<p class="extra"><strong>Ingredientes:</strong> ${escapeHtml(pick.ingredientes)}</p>` : ''}
+      ${pick.preparacion ? `<p class="extra"><strong>Cómo se hace:</strong> ${escapeHtml(pick.preparacion)}</p>` : ''}
       <div class="btn-row">
         <button class="btn-secondary" type="button" onclick="document.getElementById('randomBtn').click()">Tirar de nuevo</button>
       </div>
@@ -481,7 +657,7 @@ document.getElementById('inventBtn').addEventListener('click', async ()=>{
 async function callBackend(){
   const res = await fetch('/api/recetario', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers: apiHeaders(),
     body: JSON.stringify({ recetas: recipes.map(r => `${r.n} (${r.coc})`) })
   });
   if(!res.ok){
@@ -509,7 +685,7 @@ function extractJson(text){
 function renderAiSuggestion(sug){
   const cat = ['carne','pollo','cerdo','relleno'].includes(sug.categoria) ? sug.categoria : 'relleno';
   const coc = sug.coccion || 'Horno';
-  window.__lastSuggestion = {id:uid(), n:sug.nombre, cat, coc, d: sug.ingredientes || ''};
+  window.__lastSuggestion = {id:uid(), n:sug.nombre, cat, coc, ingredientes: sug.ingredientes || '', preparacion: sug.preparacion || ''};
   showAiResult(`
     <div class="ai-result">
       <h3>✨ ${escapeHtml(sug.nombre)}</h3>
@@ -527,13 +703,13 @@ function renderAiSuggestion(sug){
   `);
 }
 
-function acceptSuggestion(){
+async function acceptSuggestion(){
   if(!window.__lastSuggestion) return;
   recipes.unshift(window.__lastSuggestion);
-  saveRecipes();
   window.__lastSuggestion = null;
   showAiResult(`<div class="ai-result"><p>Agregada a la lista ✅</p></div>`);
   render();
+  await saveRecipes();
 }
 
 // ---------- Export / import ----------
@@ -555,13 +731,13 @@ document.getElementById('importFile').addEventListener('change', (e)=>{
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     try{
       const parsed = JSON.parse(reader.result);
       if(Array.isArray(parsed)){
-        recipes = parsed.map(r => ({id: r.id || uid(), n:r.n||'Sin nombre', cat:r.cat||'relleno', coc:r.coc||'Horno', d:r.d||''}));
-        saveRecipes();
+        recipes = parsed.map(r => normalizeRecipe({...r, n: r.n || 'Sin nombre'}));
         render();
+        await saveRecipes();
       }
     }catch(err){
       alert('El archivo no es un backup válido.');
@@ -571,7 +747,7 @@ document.getElementById('importFile').addEventListener('change', (e)=>{
   e.target.value = '';
 });
 
-render();
+boot();
 </script>
 </body>
 </html>

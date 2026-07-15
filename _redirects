@@ -7,3 +7,4 @@ http://www.thalmorcoding.com.ar/* https://thalmorcoding.ar/:splat 301!
 https://www.thalmorcoding.com.ar/* https://thalmorcoding.ar/:splat 301!
 
 /api/recetario /.netlify/functions/recetario 200
+/api/recetas /.netlify/functions/recetas 200
