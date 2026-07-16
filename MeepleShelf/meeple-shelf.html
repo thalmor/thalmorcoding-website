@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meeple Shelf — Board game collection app</title>
-<meta name="description" content="Meeple Shelf is a free, non-commercial Android app to browse and sort your BoardGameGeek collection and quickly reach rulebooks and FAQs in your language.">
+<meta name="description" content="Meeple Shelf is a free, ad-supported Android app to browse and sort your BoardGameGeek collection and quickly reach rulebooks and FAQs in your language.">
 <style>
   :root{
     --felt:#17352A;
@@ -61,6 +61,8 @@
   ul{margin:4px 0 10px 22px}
   li{margin-bottom:4px}
   a{color:var(--meeple-blue);font-weight:600}
+  .bgg-logo{display:block;margin:6px auto 0;text-align:center}
+  .bgg-logo img{max-width:200px;height:auto}
   footer{
     max-width:760px;margin:26px auto 0;text-align:center;
     color:#8FA79B;font-size:.85rem;
@@ -91,20 +93,24 @@
   </section>
 
   <section>
-    <h2>Non-commercial project <span class="es">Proyecto no comercial</span></h2>
-    <p>Meeple Shelf is a personal, non-commercial project:</p>
+    <h2>Business model <span class="es">Modelo de la app</span></h2>
+    <p>Meeple Shelf is an independent, ad-supported project:</p>
     <ul>
       <li>Completely <strong>free</strong> to download and use</li>
-      <li><strong>No advertising</strong> of any kind</li>
-      <li><strong>No payments</strong>, subscriptions or paid benefits</li>
+      <li>Funded through <strong>advertising</strong> only</li>
+      <li><strong>No payments</strong>, subscriptions or paywalled features</li>
     </ul>
-    <p class="es">Meeple Shelf es un proyecto personal sin ánimo de lucro: gratuito, sin publicidad y sin pagos ni suscripciones de ningún tipo.</p>
+    <p>As an ad-supported application, Meeple Shelf uses BoardGameGeek data under a commercial license, as described in the BGG XML API policies.</p>
+    <p class="es">Meeple Shelf es un proyecto independiente sostenido con publicidad: gratuito, financiado únicamente con anuncios, sin pagos, suscripciones ni funciones de pago. Como app con publicidad, usa los datos de BoardGameGeek bajo licencia comercial, según las políticas de la XML API de BGG.</p>
   </section>
 
   <section>
     <h2>Data source &amp; attribution <span class="es">Fuente de datos y atribución</span></h2>
-    <p>Game data is provided by the <a href="https://boardgamegeek.com" rel="noopener">BoardGameGeek</a> XML API and used in accordance with the <a href="https://boardgamegeek.com/using_the_xml_api" rel="noopener">BGG XML API Terms of Use</a>. BoardGameGeek is credited as the data source within the app, and every game links back to its page on boardgamegeek.com.</p>
-    <p class="es">Los datos de los juegos provienen de la XML API de BoardGameGeek y se usan conforme a sus términos de uso. BGG aparece acreditado como fuente dentro de la app, y cada juego enlaza a su ficha en boardgamegeek.com.</p>
+    <p>Game data is provided by the <a href="https://boardgamegeek.com" rel="noopener">BoardGameGeek</a> XML API and used in accordance with the <a href="https://boardgamegeek.com/using_the_xml_api" rel="noopener">BGG XML API Terms of Use</a>. BoardGameGeek is credited as the data source within the app, the "Powered by BGG" logo is displayed linking back to BoardGameGeek, and every game links back to its page on boardgamegeek.com.</p>
+    <p class="es">Los datos de los juegos provienen de la XML API de BoardGameGeek y se usan conforme a sus términos de uso. BGG aparece acreditado como fuente dentro de la app, se muestra el logo "Powered by BGG" enlazando a BoardGameGeek, y cada juego enlaza a su ficha en boardgamegeek.com.</p>
+    <a class="bgg-logo" href="https://boardgamegeek.com" rel="noopener">
+      <img src="powered-by-bgg.png" alt="Powered by BGG">
+    </a>
   </section>
 
   <section>
