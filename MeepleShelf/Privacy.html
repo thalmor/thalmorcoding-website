@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meeple Shelf — Board game collection app</title>
+<meta name="description" content="Meeple Shelf is a free, non-commercial Android app to browse and sort your BoardGameGeek collection and quickly reach rulebooks and FAQs in your language.">
+<style>
+  :root{
+    --felt:#17352A;
+    --felt-deep:#0F241C;
+    --box:#F6EFDF;
+    --box-edge:#E4D8BF;
+    --ink:#26221A;
+    --ink-soft:#6E6553;
+    --meeple-red:#C6402E;
+    --meeple-yellow:#E3A72F;
+    --meeple-blue:#2E6FA3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Avenir Next","Segoe UI",system-ui,sans-serif;
+    background:
+      radial-gradient(1100px 550px at 50% -10%, #1F4636 0%, transparent 60%),
+      var(--felt);
+    color:var(--box);
+    line-height:1.6;
+    padding:40px 18px 70px;
+  }
+  main{max-width:760px;margin:0 auto}
+  .hero{text-align:center;margin-bottom:36px}
+  .hero .meeple{font-size:2.6rem;color:var(--meeple-yellow);display:block}
+  h1{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:clamp(2rem,6vw,2.9rem);
+    letter-spacing:.5px;margin:6px 0 4px;
+  }
+  .tagline{color:#BFD3C8;font-size:1.05rem}
+  .status{
+    display:inline-block;margin-top:14px;
+    background:var(--meeple-yellow);color:var(--ink);
+    font-weight:700;font-size:.85rem;
+    padding:5px 14px;border-radius:999px;
+  }
+  section{
+    background:var(--box);color:var(--ink);
+    border-radius:14px;border-bottom:4px solid var(--box-edge);
+    padding:24px 26px;margin-bottom:18px;
+  }
+  section h2{
+    font-family:Georgia,serif;font-size:1.25rem;
+    margin-bottom:10px;color:var(--meeple-red);
+  }
+  section h2 .es{
+    display:block;font-family:inherit;font-size:.85rem;
+    color:var(--ink-soft);font-weight:400;font-style:italic;
+  }
+  section p{margin-bottom:10px}
+  section p:last-child{margin-bottom:0}
+  section p.es{color:var(--ink-soft);font-size:.93rem;font-style:italic}
+  ul{margin:4px 0 10px 22px}
+  li{margin-bottom:4px}
+  a{color:var(--meeple-blue);font-weight:600}
+  footer{
+    max-width:760px;margin:26px auto 0;text-align:center;
+    color:#8FA79B;font-size:.85rem;
+  }
+  footer a{color:#BFD3C8}
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <span class="meeple">&#9823;</span>
+    <h1>Meeple Shelf</h1>
+    <p class="tagline">Your board game collection, sorted — with rulebooks and FAQs one tap away.<br>
+    <em>Tu colección de juegos de mesa, ordenada — con manuales y FAQs a un toque.</em></p>
+    <span class="status">In development · Android</span>
+  </div>
+
+  <section>
+    <h2>What is Meeple Shelf? <span class="es">¿Qué es Meeple Shelf?</span></h2>
+    <p>Meeple Shelf is an Android app for board game enthusiasts. It connects to a user's public BoardGameGeek collection and lets them browse, search and sort their games by name, year, BGG rank, rating, player count or playing time. From each game, users can jump directly to its rulebooks, FAQs and player aids in their preferred language.</p>
+    <p class="es">Meeple Shelf es una app Android para aficionados a los juegos de mesa. Se conecta a la colección pública del usuario en BoardGameGeek y permite explorarla, buscarla y ordenarla por nombre, año, ranking, nota, número de jugadores o duración. Desde cada juego se accede directamente a sus manuales, FAQs y ayudas de juego en el idioma preferido.</p>
+  </section>
+
+  <section>
+    <h2>Project status <span class="es">Estado del proyecto</span></h2>
+    <p>The app is currently in development, with a planned release on Google Play. It has <strong>0 users</strong> at this time. Data usage is limited to fetching a user's own collection and basic game details, with local caching to keep API requests to a minimum.</p>
+    <p class="es">La app está en desarrollo, con lanzamiento previsto en Google Play. Actualmente tiene 0 usuarios. El uso de datos se limita a la colección del propio usuario y a detalles básicos de cada juego, con caché local para minimizar las peticiones a la API.</p>
+  </section>
+
+  <section>
+    <h2>Non-commercial project <span class="es">Proyecto no comercial</span></h2>
+    <p>Meeple Shelf is a personal, non-commercial project:</p>
+    <ul>
+      <li>Completely <strong>free</strong> to download and use</li>
+      <li><strong>No advertising</strong> of any kind</li>
+      <li><strong>No payments</strong>, subscriptions or paid benefits</li>
+    </ul>
+    <p class="es">Meeple Shelf es un proyecto personal sin ánimo de lucro: gratuito, sin publicidad y sin pagos ni suscripciones de ningún tipo.</p>
+  </section>
+
+  <section>
+    <h2>Data source &amp; attribution <span class="es">Fuente de datos y atribución</span></h2>
+    <p>Game data is provided by the <a href="https://boardgamegeek.com" rel="noopener">BoardGameGeek</a> XML API and used in accordance with the <a href="https://boardgamegeek.com/using_the_xml_api" rel="noopener">BGG XML API Terms of Use</a>. BoardGameGeek is credited as the data source within the app, and every game links back to its page on boardgamegeek.com.</p>
+    <p class="es">Los datos de los juegos provienen de la XML API de BoardGameGeek y se usan conforme a sus términos de uso. BGG aparece acreditado como fuente dentro de la app, y cada juego enlaza a su ficha en boardgamegeek.com.</p>
+  </section>
+
+  <section>
+    <h2>Contact <span class="es">Contacto</span></h2>
+    <p>Developer: <strong>YOUR NAME</strong><br>
+    Email: <a href="mailto:your-email@example.com">your-email@example.com</a><br>
+    BGG user: <a href="https://boardgamegeek.com/user/YourBGGUsername" rel="noopener">YourBGGUsername</a></p>
+  </section>
+</main>
+
+<footer>
+  Meeple Shelf is an independent project and is not affiliated with or endorsed by BoardGameGeek.<br>
+  <em>Meeple Shelf es un proyecto independiente, no afiliado ni respaldado por BoardGameGeek.</em>
+</footer>
+</body>
+</html>
