@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dictado Ecográfico | Un producto de ThalmorCoding</title>
+<style>
+  :root {
+    --azul: #1a56db;
+    --azul-oscuro: #0f2f6b;
+    --gris-texto: #374151;
+    --gris-claro: #f3f4f6;
+    --borde: #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--gris-texto);
+    line-height: 1.6;
+    background: #ffffff;
+  }
+  header {
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--azul));
+    color: white;
+    padding: 64px 24px 72px;
+    text-align: center;
+  }
+  header .logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  header h1 {
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  header p.subtitle {
+    font-size: clamp(15px, 2.5vw, 19px);
+    max-width: 640px;
+    margin: 0 auto;
+    opacity: 0.95;
+  }
+  main {
+    max-width: 860px;
+    margin: -40px auto 0;
+    padding: 0 24px 60px;
+  }
+  .card {
+    background: white;
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 47, 107, 0.08);
+    padding: 40px;
+    margin-bottom: 28px;
+  }
+  h2 {
+    font-size: 22px;
+    color: var(--azul-oscuro);
+    margin-bottom: 14px;
+  }
+  p { margin-bottom: 14px; }
+  .pasos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .paso {
+    background: var(--gris-claro);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .paso .numero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--azul);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .paso h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: var(--azul-oscuro);
+  }
+  .paso p { font-size: 14px; margin-bottom: 0; }
+  .empresa-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-top: 8px;
+  }
+  .dato {
+    border-left: 3px solid var(--azul);
+    padding-left: 14px;
+  }
+  .dato .etiqueta {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+  .dato .valor {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gris-texto);
+  }
+  footer {
+    text-align: center;
+    padding: 32px 24px 48px;
+    color: #6b7280;
+    font-size: 14px;
+  }
+  footer a { color: var(--azul); text-decoration: none; }
+  .badge {
+    display: inline-block;
+    background: var(--gris-claro);
+    color: var(--azul-oscuro);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-row">ThalmorCoding · Software &amp; Soluciones Digitales</div>
+  <h1>Dictado Ecográfico</h1>
+  <p class="subtitle">La aplicación que transforma el audio de un informe ecográfico en un documento escrito, listo para entregar al paciente.</p>
+</header>
+
+<main>
+
+  <div class="card">
+    <span class="badge">Producto de ThalmorCoding</span>
+    <h2>¿Qué es Dictado Ecográfico?</h2>
+    <p>
+      Dictado Ecográfico es una aplicación desarrollada por <strong>ThalmorCoding</strong> pensada para
+      profesionales de la salud que realizan estudios de ecografía. Permite grabar el dictado hablado
+      durante o después del estudio y, de forma automática, devuelve un informe escrito, ordenado y
+      listo para revisar, firmar y entregar.
+    </p>
+    <p>
+      El objetivo es simple: que el profesional se concentre en el paciente y el estudio, y no en escribir
+      el informe a mano o dictárselo a una secretaria. Dictado Ecográfico se encarga de esa parte.
+    </p>
+
+    <div class="pasos">
+      <div class="paso">
+        <span class="numero">1</span>
+        <h3>Grabás el audio</h3>
+        <p>El profesional dicta los hallazgos del estudio con su propia voz, como ya lo hace habitualmente.</p>
+      </div>
+      <div class="paso">
+        <span class="numero">2</span>
+        <h3>La app lo procesa</h3>
+        <p>Dictado Ecográfico transcribe y organiza el contenido en la estructura habitual de un informe ecográfico.</p>
+      </div>
+      <div class="paso">
+        <span class="numero">3</span>
+        <h3>Recibís el informe</h3>
+        <p>En minutos, el informe queda disponible en formato de texto, listo para revisar y entregar.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Sobre ThalmorCoding</h2>
+    <p>
+      ThalmorCoding es la empresa de desarrollo de software de Adolfo Sebastián Barbeito, dedicada a construir
+      productos digitales a medida: aplicaciones web, apps móviles y soluciones con inteligencia artificial.
+      Dictado Ecográfico es uno de los productos desarrollados por ThalmorCoding, orientado específicamente
+      al sector de diagnóstico por imágenes.
+    </p>
+
+    <div class="empresa-grid">
+      <div class="dato">
+        <div class="etiqueta">Titular</div>
+        <div class="valor">Adolfo Sebastián Barbeito</div>
+      </div>
+      <div class="dato">
+        <div class="etiqueta">Empresa</div>
+        <div class="valor">ThalmorCoding</div>
+      </div>
+      <div class="dato">
+        <div class="etiqueta">Domicilio</div>
+        <div class="valor">Alto Pencoso 1153, Juana Koslay, San Luis, Argentina</div>
+      </div>
+      <div class="dato">
+        <div class="etiqueta">Correo electrónico</div>
+        <div class="valor">adolfobarbeito@thalmorcoding.com.ar</div>
+      </div>
+      <div class="dato">
+        <div class="etiqueta">WhatsApp / Contacto</div>
+        <div class="valor">+54 9 266 532-0863</div>
+      </div>
+      <div class="dato">
+        <div class="etiqueta">Sitio web</div>
+        <div class="valor">thalmorcoding.com.ar</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Dictado Ecográfico es un producto de <a href="https://thalmorcoding.com.ar">ThalmorCoding</a>.
+</footer>
+
+</body>
+</html>

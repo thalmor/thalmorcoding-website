@@ -46,6 +46,7 @@
           Thalmor<span class="text-brand-400">Coding</span>
         </a>
         <div class="hidden gap-8 text-sm font-medium text-slate-300 md:flex">
+          <a href="#productos" class="transition hover:text-white">Productos</a>
           <a href="#servicios" class="transition hover:text-white">Servicios</a>
           <a href="#tecnologias" class="transition hover:text-white">Tecnologías</a>
           <a href="#contacto" class="transition hover:text-white">Contacto</a>
@@ -78,9 +79,9 @@
             </p>
             <div class="mt-10 flex flex-wrap gap-4">
               <a
-                href="#servicios"
+                href="#productos"
                 class="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-200"
-                >Ver servicios</a
+                >Ver productos</a
               >
               <a
                 href="#contacto"
@@ -104,6 +105,47 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section id="productos" class="border-y border-white/10 bg-slate-900/40">
+        <div class="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+          <div class="mb-10 max-w-2xl">
+            <p class="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-400">Productos ThalmorCoding</p>
+            <h2 class="text-3xl font-bold text-white sm:text-4xl">Software propio, listo para usar</h2>
+            <p class="mt-3 text-slate-300">
+              Además de desarrollo a medida, construimos productos propios orientados a problemas reales de cada industria.
+            </p>
+          </div>
+          <a
+            href="/DictadoEcografico/"
+            class="group block rounded-2xl border border-brand-400/30 bg-slate-900/80 p-8 shadow-glow transition hover:-translate-y-1 hover:border-brand-400/60"
+          >
+            <div class="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+              <div class="max-w-2xl">
+                <span class="inline-flex items-center rounded-full border border-brand-400/40 bg-brand-500/10 px-3 py-1 text-xs font-semibold text-brand-200">
+                  Producto destacado
+                </span>
+                <h3 class="mt-4 text-2xl font-bold text-white sm:text-3xl">Dictado Ecográfico</h3>
+                <p class="mt-3 text-slate-300">
+                  Transforma el audio de un informe ecográfico en un documento escrito, listo para revisar y entregar al paciente.
+                  Un producto de ThalmorCoding para profesionales de diagnóstico por imágenes.
+                </p>
+                <ul class="mt-5 grid gap-2 text-sm text-slate-400 sm:grid-cols-3">
+                  <li>1. Grabás el audio</li>
+                  <li>2. La app lo procesa</li>
+                  <li>3. Recibís el informe</li>
+                </ul>
+              </div>
+              <div class="shrink-0">
+                <span
+                  class="inline-flex items-center rounded-xl bg-brand-500 px-6 py-3 text-sm font-semibold text-white transition group-hover:bg-brand-400"
+                >
+                  Conocer el producto →
+                </span>
+              </div>
+            </div>
+          </a>
         </div>
       </section>
 
@@ -203,7 +245,11 @@
     </main>
 
     <footer class="border-t border-white/10 py-8 text-center text-sm text-slate-400">
-      © <span id="year"></span> ThalmorCoding. Todos los derechos reservados.
+      <p>
+        <a href="/DictadoEcografico/" class="text-brand-400 transition hover:text-brand-300">Dictado Ecográfico</a>
+        · un producto de ThalmorCoding
+      </p>
+      <p class="mt-3">© <span id="year"></span> ThalmorCoding. Todos los derechos reservados.</p>
     </footer>
 
     <script>
