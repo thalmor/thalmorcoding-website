@@ -2,5 +2,9 @@
   publish = "."
   functions = "netlify/functions"
 
+  # Vendor minified libs can coincidentally contain short env values (false positives).
+  [build.environment]
+    SECRETS_SCAN_OMIT_PATHS = "utilidades/lib/**"
+
 [functions]
   node_bundler = "esbuild"
