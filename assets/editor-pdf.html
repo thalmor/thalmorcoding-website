@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Editor de PDF</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <style>
   :root{
     --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
@@ -182,9 +179,64 @@
 <div id="toast"></div>
 
 <script>
-const { PDFDocument, degrees } = PDFLib;
-pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+// ---- Carga de librerías con reintento entre varios CDN ----
+const LIBS = {
+  pdflib: [
+    "https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js",
+    "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"
+  ],
+  pdfjs: [
+    "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js",
+    "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
+  ],
+  sortable: [
+    "https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js",
+    "https://unpkg.com/sortablejs@1.15.2/Sortable.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"
+  ]
+};
+const WORKERS = {
+  "cdn.jsdelivr.net": "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js",
+  "unpkg.com": "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js",
+  "cdnjs.cloudflare.com": "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"
+};
+function loadScript(urls){
+  return new Promise((resolve, reject) => {
+    let i = 0;
+    (function next(){
+      if(i >= urls.length){ reject(new Error("todas las fuentes fallaron")); return; }
+      const url = urls[i++];
+      const s = document.createElement("script");
+      s.src = url;
+      s.onload = () => resolve(url);
+      s.onerror = () => { s.remove(); next(); };
+      document.head.appendChild(s);
+    })();
+  });
+}
 
+let PDFDocument, degrees;
+
+async function boot(){
+  try{
+    await loadScript(LIBS.pdflib);
+    const pdfjsUrl = await loadScript(LIBS.pdfjs);
+    await loadScript(LIBS.sortable);
+    ({ PDFDocument, degrees } = PDFLib);
+    const host = new URL(pdfjsUrl).host;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = WORKERS[host] || WORKERS["cdn.jsdelivr.net"];
+    initApp();
+  }catch(e){
+    console.error(e);
+    document.getElementById("drop").innerHTML =
+      '<h2>No se pudieron cargar las librerías</h2><p>Revisá tu conexión a internet y recargá la página.</p>';
+  }
+}
+document.addEventListener("DOMContentLoaded", boot);
+
+function initApp(){
 // Estado
 let docs = [];      // { id, name, bytes(Uint8Array), pdfjs(doc) }
 let pages = [];     // { uid, docId, pageIndex, rotation }
@@ -401,6 +453,7 @@ function downloadBytes(bytes, name){
   setTimeout(()=>URL.revokeObjectURL(url), 4000);
 }
 function humanSize(n){ return n>1048576 ? (n/1048576).toFixed(1)+' MB' : Math.round(n/1024)+' KB'; }
+} // fin initApp
 </script>
 </body>
 </html>
