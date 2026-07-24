@@ -6,8 +6,10 @@ https://thalmorcoding.com.ar/* https://thalmorcoding.ar/:splat 301!
 http://www.thalmorcoding.com.ar/* https://thalmorcoding.ar/:splat 301!
 https://www.thalmorcoding.com.ar/* https://thalmorcoding.ar/:splat 301!
 
-/utilidades/editor-pdf.html /utilidades/EDITORPDF.html 301!
-/utilidades/editor-pdf /utilidades/EDITORPDF.html 301!
+/utilidades/editor-pdf.html /utilidades/editorpdf.html 301!
+/utilidades/editor-pdf /utilidades/editorpdf.html 301!
+/utilidades/EDITORPDF.html /utilidades/editorpdf.html 301!
+/utilidades/EDITORPDF /utilidades/editorpdf.html 301!
 
 /api/recetario /.netlify/functions/recetario 200
 /api/recetas /.netlify/functions/recetas 200
