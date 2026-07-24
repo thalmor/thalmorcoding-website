@@ -180,18 +180,22 @@
 
 <script>
 // ---- Carga de librerías con reintento entre varios CDN ----
+// Primero intenta la carpeta local "lib/" (mismo servidor). Los CDN quedan solo de respaldo.
 const LIBS = {
   pdflib: [
+    "lib/pdf-lib.min.js",
     "https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js",
     "https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"
   ],
   pdfjs: [
+    "lib/pdf.min.js",
     "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js",
     "https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
   ],
   sortable: [
+    "lib/Sortable.min.js",
     "https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js",
     "https://unpkg.com/sortablejs@1.15.2/Sortable.min.js",
     "https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"
@@ -225,8 +229,11 @@ async function boot(){
     const pdfjsUrl = await loadScript(LIBS.pdfjs);
     await loadScript(LIBS.sortable);
     ({ PDFDocument, degrees } = PDFLib);
-    const host = new URL(pdfjsUrl).host;
-    pdfjsLib.GlobalWorkerOptions.workerSrc = WORKERS[host] || WORKERS["cdn.jsdelivr.net"];
+    if(/^https?:/i.test(pdfjsUrl)){
+      pdfjsLib.GlobalWorkerOptions.workerSrc = WORKERS[new URL(pdfjsUrl).host] || WORKERS["cdn.jsdelivr.net"];
+    }else{
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "lib/pdf.worker.min.js"; // versión local
+    }
     initApp();
   }catch(e){
     console.error(e);
