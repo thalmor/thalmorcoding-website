@@ -68,6 +68,9 @@
   }
   .page.sortable-ghost{opacity:.35}
   .page.sortable-chosen{cursor:grabbing}
+  .page.sel{outline:3px solid var(--accent); outline-offset:-3px}
+  .page .pick{position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,.55); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700}
+  .page.sel .pick{background:var(--accent)}
   .thumbwrap{
     background:var(--panel2); aspect-ratio:3/4; display:flex; align-items:center; justify-content:center;
     overflow:hidden;
@@ -116,6 +119,17 @@
   .spin{width:18px;height:18px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite;display:inline-block;vertical-align:middle}
   @keyframes sp{to{transform:rotate(360deg)}}
   .privacy{margin-top:22px; text-align:center; color:var(--muted); font-size:12px}
+  #editDlg{max-width:min(96vw,1000px); width:auto}
+  .edlg{padding:16px}
+  .etools{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px}
+  .ecolors{display:flex; gap:6px; align-items:center}
+  .csw{width:24px; height:24px; border-radius:50%; border:2px solid transparent; cursor:pointer; padding:0}
+  .csw.on{border-color:var(--accent)}
+  .esize{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted)}
+  .ecanvaswrap{max-height:68vh; overflow:auto; background:var(--panel2); border:1px solid var(--line); border-radius:10px; display:flex; justify-content:center; align-items:flex-start; padding:10px}
+  #editCanvas{background:#fff; box-shadow:0 2px 12px rgba(0,0,0,.25); cursor:crosshair; max-width:100%; height:auto}
+  .ehint{color:var(--muted); font-size:12px; margin:10px 2px 0}
+  .btn.tool-on{background:var(--accent); border-color:var(--accent); color:#fff}
 </style>
 </head>
 <body>
@@ -147,8 +161,10 @@
   <div id="workspace" style="display:none">
     <div class="toolbar">
       <span class="count" id="counter">0 páginas</span>
-      <span class="hint">· Arrastrá las páginas para reordenarlas</span>
+      <span class="hint">· Arrastrá para reordenar · Tocá páginas para seleccionarlas y unirlas</span>
       <div class="spacer"></div>
+      <button class="btn primary" id="mergeBtn" style="display:none">Unir 2 páginas</button>
+      <button class="btn" id="blankBtn">＋ Página en blanco</button>
       <button class="btn" id="rotateAllBtn">Rotar todas ⟳</button>
       <button class="btn" id="clearBtn">Vaciar</button>
     </div>
@@ -173,6 +189,28 @@
       <button class="btn" id="compressCancel">Cancelar</button>
       <button class="btn green" id="compressGo">Comprimir y descargar</button>
     </div>
+  </div>
+</dialog>
+
+<dialog id="editDlg">
+  <div class="edlg">
+    <div class="etools">
+      <button class="btn" id="etRect">▭ Tapar (blanco)</button>
+      <button class="btn" id="etText">🅣 Texto</button>
+      <span class="ecolors" id="etColors">
+        <button class="csw on" data-c="#000000" style="background:#000000" title="Negro"></button>
+        <button class="csw" data-c="#d40000" style="background:#d40000" title="Rojo"></button>
+        <button class="csw" data-c="#1155cc" style="background:#1155cc" title="Azul"></button>
+        <button class="csw" data-c="#ffffff" style="background:#ffffff; border:1px solid #ccc" title="Blanco"></button>
+      </span>
+      <label class="esize">Tamaño texto <input type="range" id="etSize" min="1" max="9" value="3"></label>
+      <div class="spacer"></div>
+      <button class="btn" id="etUndo">Deshacer</button>
+      <button class="btn" id="etCancel">Cancelar</button>
+      <button class="btn primary" id="etDone">Listo</button>
+    </div>
+    <div class="ecanvaswrap"><canvas id="editCanvas"></canvas></div>
+    <p class="ehint">Corrector: elegí "Tapar" y arrastrá sobre la zona a ocultar. Texto: elegí "Texto", hacé clic donde querés escribir y tipeá. El color y el tamaño aplican al texto.</p>
   </div>
 </dialog>
 
@@ -221,14 +259,14 @@ function loadScript(urls){
   });
 }
 
-let PDFDocument, degrees;
+let PDFDocument, degrees, StandardFonts, rgb;
 
 async function boot(){
   try{
     await loadScript(LIBS.pdflib);
     const pdfjsUrl = await loadScript(LIBS.pdfjs);
     await loadScript(LIBS.sortable);
-    ({ PDFDocument, degrees } = PDFLib);
+    ({ PDFDocument, degrees, StandardFonts, rgb } = PDFLib);
     if(/^https?:/i.test(pdfjsUrl)){
       pdfjsLib.GlobalWorkerOptions.workerSrc = WORKERS[new URL(pdfjsUrl).host] || WORKERS["cdn.jsdelivr.net"];
     }else{
@@ -246,9 +284,10 @@ document.addEventListener("DOMContentLoaded", boot);
 function initApp(){
 // Estado
 let docs = [];      // { id, name, bytes(Uint8Array), pdfjs(doc) }
-let pages = [];     // { uid, docId, pageIndex, rotation }
+let pages = [];     // { uid, docId, pageIndex, rotation } | blank | merge(parts[])
 let uidSeq = 0;
 let docSeq = 0;
+let selected = new Set();  // uids de páginas seleccionadas para unir
 
 const el = id => document.getElementById(id);
 const grid = el('grid');
@@ -315,24 +354,41 @@ async function render(){
     card.className = 'page';
     card.dataset.uid = p.uid;
     const doc = docs.find(d=>d.id===p.docId);
+    const label = p.merge ? 'Unidas' : (p.blank ? 'En blanco' : (doc ? escapeHtml(doc.name) : ''));
+    if(selected.has(p.uid)) card.classList.add('sel');
     card.innerHTML = `
       <div class="thumbwrap"><canvas></canvas></div>
       <div class="num">${idx+1}</div>
-      <div class="src">${doc ? escapeHtml(doc.name) : ''}</div>
+      <div class="pick">${selected.has(p.uid) ? '✓' : ''}</div>
+      <div class="src">${label}</div>
       <div class="actions">
+        <button title="Editar (tapar / texto)" class="edt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button title="Rotar" class="rot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
         <button title="Borrar" class="del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
       </div>`;
+    card.querySelector('.edt').onclick = (e)=>{ e.stopPropagation(); openEditor(p); };
     card.querySelector('.rot').onclick = (e)=>{ e.stopPropagation(); p.rotation = (p.rotation+90)%360; applyThumbRotation(card, p); };
-    card.querySelector('.del').onclick = (e)=>{ e.stopPropagation(); pages = pages.filter(x=>x!==p); render(); };
+    card.querySelector('.del').onclick = (e)=>{ e.stopPropagation(); selected.delete(p.uid); pages = pages.filter(x=>x!==p); render(); };
+    card.onclick = () => toggleSelect(p.uid, card);
     grid.appendChild(card);
-    renderThumb(card.querySelector('canvas'), p).then(()=>applyThumbRotation(card, p));
+    if(p.merge){ renderMergeThumb(card.querySelector('canvas'), p).then(()=>applyThumbRotation(card, p)); }
+    else if(p.blank){ drawBlankThumb(card.querySelector('canvas'), p); applyThumbRotation(card, p); }
+    else renderThumb(card.querySelector('canvas'), p).then(()=>applyThumbRotation(card, p));
   });
+  updateMergeBtn();
 }
 
 function applyThumbRotation(card, p){
   const c = card.querySelector('canvas');
   if(c) c.style.transform = `rotate(${p.rotation}deg)`;
+}
+// Miniatura de una página en blanco (A4)
+function drawBlankThumb(canvas, p){
+  canvas.width = 220; canvas.height = 311;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,220,311);
+  ctx.strokeStyle = '#c9d2e0'; ctx.lineWidth = 2; ctx.strokeRect(1,1,218,309);
+  drawAnnotsCanvas(ctx, p && p.annots, 220, 311);
 }
 function escapeHtml(s){ return s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
@@ -354,16 +410,20 @@ async function renderThumb(canvas, p){
       thumbCache.set(key, bmp);
     }
     canvas.width = bmp.width; canvas.height = bmp.height;
-    canvas.getContext('2d').drawImage(bmp, 0, 0);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(bmp, 0, 0);
+    drawAnnotsCanvas(ctx, p.annots, canvas.width, canvas.height);
   }catch(err){ console.error('thumb', err); }
 }
 
 // Ordenar con drag & drop
+let lastDragTs = 0;
 new Sortable(grid, {
   animation: 160,
   ghostClass: 'sortable-ghost',
   chosenClass: 'sortable-chosen',
   onEnd: () => {
+    lastDragTs = Date.now();
     const order = [...grid.children].map(c => +c.dataset.uid);
     pages.sort((a,b) => order.indexOf(a.uid) - order.indexOf(b.uid));
     // Actualizar numeración sin recargar miniaturas
@@ -372,8 +432,216 @@ new Sortable(grid, {
 });
 
 // Toolbar
-el('clearBtn').onclick = () => { if(confirm('¿Vaciar todo y empezar de nuevo?')){ pages=[]; docs=[]; thumbCache.clear(); render(); } };
+el('clearBtn').onclick = () => { if(confirm('¿Vaciar todo y empezar de nuevo?')){ pages=[]; docs=[]; selected.clear(); thumbCache.clear(); render(); } };
 el('rotateAllBtn').onclick = () => { pages.forEach(p=>p.rotation=(p.rotation+90)%360); [...grid.children].forEach((card)=>{ const p=pages.find(x=>x.uid==card.dataset.uid); if(p) applyThumbRotation(card,p); }); };
+// Agregar página en blanco (tamaño A4 vertical: 595 x 842 puntos)
+el('blankBtn').onclick = () => { pages.push({ uid: ++uidSeq, blank: true, w: 595.28, h: 841.89, rotation: 0 }); render(); };
+
+// --- Selección y unión de páginas ---
+function toggleSelect(uid, card){
+  if(Date.now() - lastDragTs < 250) return; // ignorar el clic que sigue a un arrastre
+  if(selected.has(uid)) selected.delete(uid); else selected.add(uid);
+  card.classList.toggle('sel', selected.has(uid));
+  card.querySelector('.pick').textContent = selected.has(uid) ? '✓' : '';
+  updateMergeBtn();
+}
+function updateMergeBtn(){
+  const n = selected.size;
+  const b = el('mergeBtn');
+  b.style.display = n >= 2 ? 'inline-flex' : 'none';
+  b.textContent = 'Unir ' + n + ' páginas en 1';
+}
+// Devuelve las "partes hoja" de una página (aplana páginas ya unidas)
+function leafParts(p){
+  if(p.merge) return p.parts.slice();
+  return [{ docId: p.docId, pageIndex: p.pageIndex, blank: !!p.blank, w: p.w, h: p.h }];
+}
+el('mergeBtn').onclick = () => {
+  const chosen = pages.filter(p => selected.has(p.uid));
+  if(chosen.length < 2) return;
+  const parts = [];
+  chosen.forEach(p => parts.push(...leafParts(p)));
+  const firstIdx = pages.findIndex(p => selected.has(p.uid));
+  const merged = { uid: ++uidSeq, merge: true, parts, rotation: 0 };
+  pages = pages.filter(p => !selected.has(p.uid));
+  pages.splice(firstIdx, 0, merged);
+  selected.clear();
+  render();
+};
+
+// Construye un canvas con las partes de una página unida, lado a lado, a la altura H (px)
+async function buildMergeCanvas(p, H){
+  const imgs = [];
+  let totalW = 0;
+  for(const part of p.parts){
+    if(part.blank || part.docId == null){
+      const w = Math.round(H * ((part.w||595.28)/(part.h||841.89)));
+      imgs.push({ w, blank: true });
+      totalW += w;
+      continue;
+    }
+    const doc = docs.find(d => d.id === part.docId);
+    const page = await doc.pdfjs.getPage(part.pageIndex + 1);
+    const vp1 = page.getViewport({ scale: 1 });
+    const scale = H / vp1.height;
+    const v = page.getViewport({ scale });
+    const off = document.createElement('canvas');
+    off.width = Math.max(1, Math.round(v.width)); off.height = Math.max(1, Math.round(v.height));
+    const c = off.getContext('2d');
+    c.fillStyle = '#fff'; c.fillRect(0,0,off.width,off.height);
+    await page.render({ canvasContext: c, viewport: v }).promise;
+    imgs.push({ w: off.width, cv: off });
+    totalW += off.width;
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, totalW); canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,H);
+  let x = 0;
+  for(const im of imgs){
+    if(im.cv) ctx.drawImage(im.cv, x, 0);
+    else { ctx.strokeStyle = '#c9d2e0'; ctx.strokeRect(x+1,1,im.w-2,H-2); }
+    x += im.w;
+  }
+  return canvas;
+}
+// Miniatura de una página unida
+async function renderMergeThumb(canvas, p){
+  try{
+    const src = await buildMergeCanvas(p, 300);
+    canvas.width = src.width; canvas.height = src.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(src, 0, 0);
+    drawAnnotsCanvas(ctx, p.annots, canvas.width, canvas.height);
+  }catch(err){ console.error('mergeThumb', err); }
+}
+// Rota un canvas 90/180/270 grados y devuelve uno nuevo
+function rotateCanvas(src, deg){
+  deg = ((deg % 360) + 360) % 360;
+  if(deg === 0) return src;
+  const c = document.createElement('canvas');
+  const ctx = c.getContext('2d');
+  if(deg === 180){ c.width = src.width; c.height = src.height; ctx.translate(c.width, c.height); ctx.rotate(Math.PI); }
+  else { c.width = src.height; c.height = src.width;
+    if(deg === 90){ ctx.translate(c.width, 0); ctx.rotate(Math.PI/2); }
+    else { ctx.translate(0, c.height); ctx.rotate(-Math.PI/2); } }
+  ctx.drawImage(src, 0, 0);
+  return c;
+}
+
+// ---- Anotaciones: tapar (rectángulo blanco) y texto ----
+// Coordenadas normalizadas 0..1 con origen arriba-izquierda; el tamaño de texto es fracción de la altura.
+function drawAnnotsCanvas(ctx, annots, w, h){
+  if(!annots) return;
+  for(const a of annots){
+    if(a.type === 'rect'){
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(a.x*w, a.y*h, a.w*w, a.h*h);
+    } else if(a.type === 'text'){
+      const px = a.size * h;
+      ctx.fillStyle = a.color || '#000000';
+      ctx.font = '600 ' + px + 'px -apple-system, Helvetica, Arial, sans-serif';
+      ctx.textBaseline = 'top';
+      ctx.fillText(a.text, a.x*w, a.y*h);
+    }
+  }
+}
+function hexToRgb(hex){ const n = parseInt(hex.slice(1),16); return { r:((n>>16)&255)/255, g:((n>>8)&255)/255, b:(n&255)/255 }; }
+function drawAnnotsPdf(pg, annots, W, H, font){
+  for(const a of annots){
+    if(a.type === 'rect'){
+      pg.drawRectangle({ x:a.x*W, y:H-(a.y+a.h)*H, width:a.w*W, height:a.h*H, color: rgb(1,1,1) });
+    } else if(a.type === 'text'){
+      const size = a.size * H;
+      const c = hexToRgb(a.color || '#000000');
+      pg.drawText(a.text, { x:a.x*W, y:H - a.y*H - size, size, font, color: rgb(c.r,c.g,c.b) });
+    }
+  }
+}
+
+let editState = null;
+function sizeFromSlider(v){ return 0.012 + (v-1)*0.006; }
+async function buildBaseCanvas(p, H){
+  if(p.merge) return await buildMergeCanvas(p, H);
+  if(p.blank){
+    const w = Math.round(H * (p.w/p.h));
+    const c = document.createElement('canvas'); c.width = w; c.height = H;
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,H);
+    ctx.strokeStyle = '#e2e7f0'; ctx.strokeRect(0.5,0.5,w-1,H-1);
+    return c;
+  }
+  const doc = docs.find(d=>d.id===p.docId);
+  const page = await doc.pdfjs.getPage(p.pageIndex+1);
+  const vp1 = page.getViewport({ scale:1 });
+  const scale = H / vp1.height;
+  const v = page.getViewport({ scale });
+  const c = document.createElement('canvas'); c.width = Math.max(1,Math.round(v.width)); c.height = Math.max(1,Math.round(v.height));
+  const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,c.width,c.height);
+  await page.render({ canvasContext: ctx, viewport: v }).promise;
+  return c;
+}
+async function openEditor(p){
+  toast('Abriendo editor…', true);
+  const base = await buildBaseCanvas(p, 1100);
+  hideToast();
+  editState = { p, base, annots: (p.annots||[]).map(a=>({...a})), tool:'rect', color:'#000000', sizeFrac: sizeFromSlider(3), drawing:null };
+  const cv = el('editCanvas');
+  cv.width = base.width; cv.height = base.height;
+  el('etSize').value = 3;
+  el('etColors').querySelectorAll('.csw').forEach(b=>b.classList.toggle('on', b.dataset.c==='#000000'));
+  setTool('rect');
+  redrawEditor();
+  el('editDlg').showModal();
+}
+function redrawEditor(){
+  const cv = el('editCanvas'); const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.drawImage(editState.base, 0, 0);
+  drawAnnotsCanvas(ctx, editState.annots, cv.width, cv.height);
+  const d = editState.drawing;
+  if(d){ ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.strokeStyle='#3667e0'; ctx.lineWidth=2; ctx.fillRect(d.x,d.y,d.w,d.h); ctx.strokeRect(d.x,d.y,d.w,d.h); }
+}
+function setTool(t){
+  if(!editState) return;
+  editState.tool = t;
+  el('etRect').classList.toggle('tool-on', t==='rect');
+  el('etText').classList.toggle('tool-on', t==='text');
+  el('editCanvas').style.cursor = t==='text' ? 'text' : 'crosshair';
+}
+(function(){
+  const cv = el('editCanvas');
+  function pos(e){ const r=cv.getBoundingClientRect(); return { x:(e.clientX-r.left)*(cv.width/r.width), y:(e.clientY-r.top)*(cv.height/r.height) }; }
+  let start = null;
+  cv.addEventListener('mousedown', e=>{
+    if(!editState) return;
+    if(editState.tool === 'text'){
+      const pt = pos(e);
+      const txt = prompt('Texto a escribir:');
+      if(txt){ editState.annots.push({ type:'text', x:pt.x/cv.width, y:pt.y/cv.height, text:txt, size:editState.sizeFrac, color:editState.color }); redrawEditor(); }
+      return;
+    }
+    start = pos(e); editState.drawing = { x:start.x, y:start.y, w:0, h:0 };
+  });
+  cv.addEventListener('mousemove', e=>{
+    if(!editState || !start) return;
+    const pt = pos(e);
+    editState.drawing = { x:Math.min(start.x,pt.x), y:Math.min(start.y,pt.y), w:Math.abs(pt.x-start.x), h:Math.abs(pt.y-start.y) };
+    redrawEditor();
+  });
+  window.addEventListener('mouseup', ()=>{
+    if(!editState || !start) return;
+    const d = editState.drawing; start = null; editState.drawing = null;
+    if(d && d.w>3 && d.h>3){ editState.annots.push({ type:'rect', x:d.x/cv.width, y:d.y/cv.height, w:d.w/cv.width, h:d.h/cv.height }); }
+    redrawEditor();
+  });
+})();
+el('etRect').onclick = ()=> setTool('rect');
+el('etText').onclick = ()=> setTool('text');
+el('etColors').addEventListener('click', e=>{ const b=e.target.closest('.csw'); if(!b||!editState) return; editState.color=b.dataset.c; el('etColors').querySelectorAll('.csw').forEach(x=>x.classList.remove('on')); b.classList.add('on'); });
+el('etSize').addEventListener('input', e=>{ if(editState) editState.sizeFrac = sizeFromSlider(+e.target.value); });
+el('etUndo').onclick = ()=>{ if(editState && editState.annots.length){ editState.annots.pop(); redrawEditor(); } };
+el('etCancel').onclick = ()=>{ el('editDlg').close(); editState=null; };
+el('etDone').onclick = ()=>{ if(!editState) return; editState.p.annots = editState.annots; el('editDlg').close(); editState=null; render(); };
 
 // Descargar (reordenado, rotado, combinado) — conserva el texto
 el('saveBtn').onclick = async () => {
@@ -382,20 +650,31 @@ el('saveBtn').onclick = async () => {
   toast('Armando el PDF…', true);
   try{
     const out = await PDFDocument.create();
+    const font = await out.embedFont(StandardFonts.Helvetica);
     const srcCache = new Map();
     for(const p of pages){
-      let src = srcCache.get(p.docId);
-      if(!src){
-        const doc = docs.find(d=>d.id===p.docId);
-        src = await PDFDocument.load(doc.bytes.slice(), { ignoreEncryption:true });
-        srcCache.set(p.docId, src);
+      let pg, W, H;
+      if(p.blank){
+        pg = out.addPage([p.w, p.h]); W = p.w; H = p.h;
+        if(p.rotation) pg.setRotation(degrees(p.rotation % 360));
+      } else if(p.merge){
+        const r = await addMergedPage(out, p); pg = r.pg; W = r.W; H = r.H;
+      } else {
+        let src = srcCache.get(p.docId);
+        if(!src){
+          const doc = docs.find(d=>d.id===p.docId);
+          src = await PDFDocument.load(doc.bytes.slice(), { ignoreEncryption:true });
+          srcCache.set(p.docId, src);
+        }
+        const [copied] = await out.copyPages(src, [p.pageIndex]);
+        const sz = copied.getSize(); W = sz.width; H = sz.height;
+        if(p.rotation){
+          const base = copied.getRotation().angle || 0;
+          copied.setRotation(degrees((base + p.rotation) % 360));
+        }
+        out.addPage(copied); pg = copied;
       }
-      const [copied] = await out.copyPages(src, [p.pageIndex]);
-      if(p.rotation){
-        const base = copied.getRotation().angle || 0;
-        copied.setRotation(degrees((base + p.rotation) % 360));
-      }
-      out.addPage(copied);
+      if(p.annots && p.annots.length) drawAnnotsPdf(pg, p.annots, W, H, font);
     }
     const bytes = await out.save();
     downloadBytes(bytes, 'editado.pdf');
@@ -404,6 +683,31 @@ el('saveBtn').onclick = async () => {
     console.error(err); hideToast(); toast('Error al generar el PDF');
   }finally{ el('saveBtn').disabled = false; }
 };
+
+// Arma una hoja con varias páginas incrustadas lado a lado (vectorial)
+async function addMergedPage(out, p){
+  const items = [];
+  for(const part of p.parts){
+    if(part.blank || part.docId == null){
+      items.push({ blank:true, w: part.w||595.28, h: part.h||841.89 });
+    }else{
+      const doc = docs.find(d=>d.id===part.docId);
+      const [emb] = await out.embedPdf(doc.bytes.slice(), [part.pageIndex]);
+      items.push({ emb, w: emb.width, h: emb.height });
+    }
+  }
+  const H = Math.max(...items.map(it => it.h));
+  let totalW = 0;
+  const placed = items.map(it => { const s = H/it.h; const w = it.w*s; totalW += w; return { emb: it.emb, w }; });
+  const pg = out.addPage([totalW, H]);
+  let x = 0;
+  for(const it of placed){
+    if(it.emb) pg.drawPage(it.emb, { x, y: 0, width: it.w, height: H });
+    x += it.w;
+  }
+  if(p.rotation) pg.setRotation(degrees(p.rotation % 360));
+  return { pg, W: totalW, H };
+}
 
 // Achicar tamaño (dialog)
 const dlg = el('compressDlg');
@@ -428,15 +732,26 @@ async function compressAndDownload(quality, scale){
     const out = await PDFDocument.create();
     for(let i=0;i<pages.length;i++){
       const p = pages[i];
-      const doc = docs.find(d=>d.id===p.docId);
-      const page = await doc.pdfjs.getPage(p.pageIndex+1);
-      const vp = page.getViewport({ scale, rotation: p.rotation });
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.max(1, Math.floor(vp.width));
-      canvas.height = Math.max(1, Math.floor(vp.height));
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
-      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      let canvas;
+      if(p.blank){
+        canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.floor(p.w*scale)); canvas.height = Math.max(1, Math.floor(p.h*scale));
+        const c = canvas.getContext('2d'); c.fillStyle = '#ffffff'; c.fillRect(0,0,canvas.width,canvas.height);
+      }else if(p.merge){
+        canvas = await buildMergeCanvas(p, Math.max(1, Math.floor(842*scale)));
+      }else{
+        const doc = docs.find(d=>d.id===p.docId);
+        const page = await doc.pdfjs.getPage(p.pageIndex+1);
+        const vp = page.getViewport({ scale });
+        canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.floor(vp.width));
+        canvas.height = Math.max(1, Math.floor(vp.height));
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      }
+      if(p.annots && p.annots.length) drawAnnotsCanvas(canvas.getContext('2d'), p.annots, canvas.width, canvas.height);
+      if(p.rotation) canvas = rotateCanvas(canvas, p.rotation);
       const jpg = await new Promise(res => canvas.toBlob(b=>res(b), 'image/jpeg', quality));
       const img = await out.embedJpg(new Uint8Array(await jpg.arrayBuffer()));
       const pg = out.addPage([canvas.width, canvas.height]);
