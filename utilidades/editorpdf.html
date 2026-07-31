@@ -141,6 +141,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       Agregar PDF
     </button>
+    <button class="btn" id="blankBtn">＋ Página en blanco</button>
+    <button class="btn primary" id="mergeBtn" style="display:none">Unir 2 páginas</button>
+    <button class="btn" id="rotateAllBtn" disabled>Rotar todas ⟳</button>
+    <button class="btn" id="clearBtn" disabled>Vaciar</button>
     <button class="btn green" id="compressBtn" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>
       Achicar tamaño
@@ -149,6 +153,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       Descargar PDF
     </button>
+    <button class="btn" id="ocrBtn" disabled title="Reconstruir el texto de páginas escaneadas como texto editable (OCR en español)">🔤 Reconstruir (OCR)</button>
   </div>
 </header>
 
@@ -162,11 +167,6 @@
     <div class="toolbar">
       <span class="count" id="counter">0 páginas</span>
       <span class="hint">· Arrastrá para reordenar · Tocá páginas para seleccionarlas y unirlas</span>
-      <div class="spacer"></div>
-      <button class="btn primary" id="mergeBtn" style="display:none">Unir 2 páginas</button>
-      <button class="btn" id="blankBtn">＋ Página en blanco</button>
-      <button class="btn" id="rotateAllBtn">Rotar todas ⟳</button>
-      <button class="btn" id="clearBtn">Vaciar</button>
     </div>
     <div class="grid" id="grid"></div>
   </div>
@@ -309,10 +309,9 @@ el('fileInput').onchange = e => { handleFiles(e.target.files); e.target.value=''
 
 ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag')}));
-drop.addEventListener('drop', e=>{ if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
-// Permitir soltar en cualquier parte
+// Un único manejador de "soltar" a nivel ventana (evita cargar el archivo dos veces).
 window.addEventListener('dragover', e=>e.preventDefault());
-window.addEventListener('drop', e=>{ e.preventDefault(); if(e.target.closest('#grid')) return; if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
+window.addEventListener('drop', e=>{ e.preventDefault(); if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
 
 async function handleFiles(fileList){
   const files = [...fileList].filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
@@ -344,6 +343,9 @@ async function render(){
   workspace.style.display = has ? 'block' : 'none';
   el('saveBtn').disabled = !has;
   el('compressBtn').disabled = !has;
+  el('rotateAllBtn').disabled = !has;
+  el('clearBtn').disabled = !has;
+  el('ocrBtn').disabled = !has;
   el('counter').textContent = pages.length + (pages.length===1?' página':' páginas');
 
   grid.innerHTML = '';
@@ -434,8 +436,19 @@ new Sortable(grid, {
 // Toolbar
 el('clearBtn').onclick = () => { if(confirm('¿Vaciar todo y empezar de nuevo?')){ pages=[]; docs=[]; selected.clear(); thumbCache.clear(); render(); } };
 el('rotateAllBtn').onclick = () => { pages.forEach(p=>p.rotation=(p.rotation+90)%360); [...grid.children].forEach((card)=>{ const p=pages.find(x=>x.uid==card.dataset.uid); if(p) applyThumbRotation(card,p); }); };
-// Agregar página en blanco (tamaño A4 vertical: 595 x 842 puntos)
-el('blankBtn').onclick = () => { pages.push({ uid: ++uidSeq, blank: true, w: 595.28, h: 841.89, rotation: 0 }); render(); };
+// Agregar página en blanco (A4 vertical: 595 x 842 puntos).
+// Sin selección: al final. Con selección: justo después de la última página seleccionada.
+el('blankBtn').onclick = () => {
+  const blank = { uid: ++uidSeq, blank: true, w: 595.28, h: 841.89, rotation: 0 };
+  if(selected.size){
+    let idx = -1;
+    pages.forEach((p,i)=>{ if(selected.has(p.uid)) idx = i; });
+    pages.splice(idx+1, 0, blank);
+  } else {
+    pages.push(blank);
+  }
+  render();
+};
 
 // --- Selección y unión de páginas ---
 function toggleSelect(uid, card){
@@ -766,6 +779,103 @@ async function compressAndDownload(quality, scale){
     console.error(err); hideToast(); toast('Error al comprimir');
   }
 }
+
+// ================== OCR: reconstruir texto editable (Tesseract.js) ==================
+// Archivos auto-alojados en ocr/ (con respaldo a CDN). 100% en el navegador.
+const OCR_CDN = {
+  lib:    'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js',
+  worker: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',
+  core:   'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1/',
+  lang:   'https://tessdata.projectnaptha.com/4.0.0'
+};
+let _ocrWorker = null;
+async function getOcrWorker(){
+  if(_ocrWorker) return _ocrWorker;
+  if(typeof Tesseract === 'undefined'){
+    await loadScript(['ocr/tesseract.min.js', OCR_CDN.lib]);
+  }
+  const localOk = await fetch('ocr/worker.min.js', { method:'HEAD' }).then(r=>r.ok).catch(()=>false);
+  const paths = localOk
+    ? { workerPath:'ocr/worker.min.js', corePath:'ocr/', langPath:'ocr' }
+    : { workerPath:OCR_CDN.worker, corePath:OCR_CDN.core, langPath:OCR_CDN.lang };
+  _ocrWorker = await Tesseract.createWorker('spa', 1, {
+    ...paths,
+    logger: m => { if(m.status) toast('OCR: ' + m.status + ' ' + Math.round((m.progress||0)*100) + '%', true); }
+  });
+  return _ocrWorker;
+}
+function sanitizeWinAnsi(s){
+  return s.replace(/[‘’]/g,"'").replace(/[“”]/g,'"')
+          .replace(/[–—]/g,'-').replace(/…/g,'...')
+          .replace(/[^\x09\x0A\x0D\x20-\xFF]/g,'');
+}
+// Renderiza una página a canvas de alta resolución para OCR; devuelve tamaño en puntos.
+async function renderPageForOcr(p){
+  if(p.blank){
+    const K=2, canvas=document.createElement('canvas');
+    canvas.width=Math.round(p.w*K); canvas.height=Math.round(p.h*K);
+    const c=canvas.getContext('2d'); c.fillStyle='#fff'; c.fillRect(0,0,canvas.width,canvas.height);
+    return { canvas, wpt:p.w, hpt:p.h };
+  }
+  if(p.merge){
+    const canvas=await buildMergeCanvas(p, 1600);
+    return { canvas, wpt:canvas.width/2, hpt:canvas.height/2 };
+  }
+  const doc=docs.find(d=>d.id===p.docId);
+  const page=await doc.pdfjs.getPage(p.pageIndex+1);
+  const vp1=page.getViewport({ scale:1 });
+  const scale=Math.max(1, Math.min(4, 1600/vp1.width));
+  const v=page.getViewport({ scale });
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.max(1,Math.round(v.width)); canvas.height=Math.max(1,Math.round(v.height));
+  const ctx=canvas.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  await page.render({ canvasContext:ctx, viewport:v }).promise;
+  return { canvas, wpt:vp1.width, hpt:vp1.height };
+}
+el('ocrBtn').onclick = async () => {
+  if(!pages.length) return;
+  if(!confirm('Reconstruir el texto con OCR (español).\n\nGenera un PDF nuevo de texto editable respetando posición y cantidad de páginas. Puede tardar varios segundos por página. ¿Continuar?')) return;
+  el('ocrBtn').disabled = true;
+  try{
+    toast('Preparando OCR…', true);
+    const worker = await getOcrWorker();
+    const out = await PDFDocument.create();
+    const font = await out.embedFont(StandardFonts.TimesRoman);
+    for(let i=0;i<pages.length;i++){
+      toast('OCR página ' + (i+1) + '/' + pages.length + '…', true);
+      const p = pages[i];
+      const { canvas, wpt, hpt } = await renderPageForOcr(p);
+      const K = canvas.width / wpt;
+      const { data } = await worker.recognize(canvas);
+      const pg = out.addPage([wpt, hpt]);
+      const lns = (data.lines||[]).filter(l => l.text && l.text.trim());
+      const hs = lns.map(l => (l.bbox.y1 - l.bbox.y0)).sort((a,b)=>a-b);
+      const bodyH = hs.length ? hs[Math.floor(hs.length/2)] : 20;
+      for(const ln of lns){
+        let text = sanitizeWinAnsi(ln.text.replace(/\s+/g,' ').trim());
+        if(!text) continue;
+        const bx0 = ln.bbox.x0 / K, by0 = ln.bbox.y0 / K, by1 = ln.bbox.y1 / K;
+        let lh = (ln.bbox.y1 - ln.bbox.y0);
+        if(lh < 0.6*bodyH || lh > 1.6*bodyH) lh = bodyH; // tamaño uniforme salvo títulos claros
+        let fs = Math.max(5, (lh/K) * 0.9);
+        let nat = font.widthOfTextAtSize(text, fs);
+        const avail = (wpt - 4) - bx0;
+        if(nat > avail && nat > 0) fs = fs * avail / nat;   // que no se salga del margen
+        try{
+          pg.drawText(text, { x:bx0, y:hpt - by1 + (by1-by0)*0.15, size:fs, font, color:rgb(0,0,0) });
+        }catch(e){
+          try{ pg.drawText(text.replace(/[^\x20-\x7E]/g,''), { x:bx0, y:hpt-by1, size:fs, font }); }catch(_){}
+        }
+      }
+    }
+    const bytes = await out.save();
+    downloadBytes(bytes, 'reconstruido-editable.pdf');
+    hideToast(); toast('¡Listo! Texto reconstruido ✓');
+  }catch(err){
+    console.error(err); hideToast();
+    toast('Error en OCR: ' + err.message);
+  }finally{ el('ocrBtn').disabled = false; }
+};
 
 function downloadBytes(bytes, name){
   const blob = new Blob([bytes], { type:'application/pdf' });
