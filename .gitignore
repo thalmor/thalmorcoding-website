@@ -1,5 +1,4 @@
-# Local Netlify folder
-.netlify
-
-# Dependencies (installed by Netlify at deploy time; package-lock.json is committed)
-node_modules
+deploy-out.txt
+site.json
+site-full.json
+.netlify/
