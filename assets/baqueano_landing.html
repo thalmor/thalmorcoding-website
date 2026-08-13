@@ -9,7 +9,7 @@
 <!-- Open Graph (para que se vea bien al compartir por WhatsApp/redes) -->
 <meta property="og:title" content="Baqueano — Música para danzas folklóricas">
 <meta property="og:description" content="Saltá a cada figura de la coreografía, repetí secciones y ajustá la velocidad. Para profes de danza folklórica.">
-<meta property="og:image" content="https://thalmorcoding.ar/baqueano/baqueano_logo.png">
+<meta property="og:image" content="https://thalmorcoding.ar/Baqueano/logo-windows.png">
 <meta property="og:type" content="website">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,9 +33,20 @@
 
   /* Hero */
   header{text-align:center;padding:56px 0 24px;}
-  header img{width:150px;height:150px;border-radius:24px;}
-  header h1{font-size:2.6rem;margin:14px 0 2px;}
+  header .title-row{
+    display:flex;align-items:center;justify-content:center;gap:18px;
+    flex-wrap:wrap;margin-bottom:8px;
+  }
+  header .title-row img{
+    width:110px;height:110px;border-radius:22px;object-fit:cover;
+    border:1px solid #3a2d20;box-shadow:0 10px 28px rgba(0,0,0,.28);
+  }
+  header h1{font-size:clamp(2.2rem,6vw,3rem);margin:0;line-height:1;}
   header .tag{color:var(--humo);font-size:1.1rem;}
+  @media(max-width:520px){
+    header .title-row{gap:12px;}
+    header .title-row img{width:78px;height:78px;border-radius:16px;}
+  }
 
   /* Guarda divider */
   .guarda{height:12px;margin:26px auto;max-width:340px;
@@ -71,9 +82,11 @@
 
   <header>
     <div class="wrap">
-      <!-- Subí tu logo del paisano como baqueano_logo.png junto a este archivo -->
-      <img src="baqueano_logo.png" alt="Baqueano">
-      <h1>Baqueano</h1>
+      <div class="title-row">
+        <img src="logo-windows.png" alt="Baqueano para Windows">
+        <h1>Baqueano</h1>
+        <img src="logo-android.png" alt="Baqueano Remoto para Android">
+      </div>
       <p class="tag">Música para danzas folklóricas</p>
     </div>
   </header>
