@@ -1,0 +1,44 @@
+Calculadora de Energia Edesal - Versión Web
+==========================================
+
+URL destino:
+https://thalmorcoding.ar/energia/
+
+Compilada con base-href: /energia/
+
+Cómo subir
+----------
+1) En tu hosting, creá (o usá) la carpeta pública:
+   /energia/
+
+2) Subí TODO el contenido de ESTA carpeta (web_dist)
+   dentro de /energia/
+
+   Debe quedar así:
+   /energia/index.html
+   /energia/main.dart.js
+   /energia/flutter.js
+   /energia/assets/...
+   etc.
+
+3) Abrí:
+   https://thalmorcoding.ar/energia/
+
+Importante
+----------
+- No subas esta carpeta como /energia/web_dist
+- Subí el CONTENIDO de web_dist directamente a /energia/
+- Los datos se guardan en el navegador del usuario
+
+Archivos extra
+--------------
+- _redirects        -> Netlify / Cloudflare
+- .htaccess          -> Apache (ruta /energia/)
+- nginx.conf.ejemplo -> Nginx (ruta /energia/)
+- firebase.json      -> Firebase Hosting
+
+Si ves pantalla blanca
+----------------------
+- Revisá que index.html esté en /energia/index.html
+- Revisá que el HTML tenga: <base href="/energia/">
+- Forzá recarga sin caché (Ctrl+F5)

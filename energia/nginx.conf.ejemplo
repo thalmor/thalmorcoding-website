@@ -1,0 +1,6 @@
+# Ejemplo para servir en https://thalmorcoding.ar/energia/
+location /energia/ {
+    alias /ruta/a/tu/sitio/energia/;
+    index index.html;
+    try_files $uri $uri/ /energia/index.html;
+}
