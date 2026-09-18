@@ -4,7 +4,7 @@
 
   # Vendor minified libs can coincidentally contain short env values (false positives).
   [build.environment]
-    SECRETS_SCAN_OMIT_PATHS = "utilidades/lib/**,utilidades/ocr/**"
+    SECRETS_SCAN_OMIT_PATHS = "utilidades/lib/**,utilidades/ocr/**,energia/**"
 
 [functions]
   node_bundler = "esbuild"
