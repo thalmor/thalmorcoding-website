@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Descargas | ThalmorCoding</title>
+    <meta
+      name="description"
+      content="Descargas de software de ThalmorCoding. Releases de Mostrador."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+            },
+            colors: {
+              brand: {
+                50: "#eef7ff",
+                400: "#38bdf8",
+                500: "#0ea5e9",
+                600: "#0284c7",
+                700: "#0369a1",
+              },
+            },
+            boxShadow: {
+              glow: "0 0 0 1px rgba(56,189,248,0.25), 0 12px 40px rgba(2,132,199,0.2)",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-brand-500/30">
+    <header class="sticky top-0 z-40 border-b border-white/10 bg-slate-950/80 backdrop-blur">
+      <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+        <a href="/" class="text-xl font-extrabold tracking-tight text-white">
+          Thalmor<span class="text-brand-400">Coding</span>
+        </a>
+        <a
+          href="/"
+          class="text-sm font-medium text-slate-300 transition hover:text-white"
+          >Inicio</a
+        >
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-6 py-20 lg:px-8">
+      <p class="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-400">ThalmorCoding</p>
+      <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Descargas</h1>
+      <p class="mt-4 text-lg text-slate-300">
+        Instaladores y versiones publicadas de Mostrador.
+      </p>
+
+      <a
+        href="https://github.com/thalmor/mostrador-releases/releases"
+        class="mt-10 block rounded-2xl border border-brand-400/30 bg-slate-900/80 p-8 shadow-glow transition hover:-translate-y-1 hover:border-brand-400/60"
+      >
+        <p class="text-sm font-semibold uppercase tracking-wider text-brand-400">Mostrador</p>
+        <h2 class="mt-3 text-2xl font-bold text-white">Releases</h2>
+        <p class="mt-3 break-all text-slate-300">
+          https://github.com/thalmor/mostrador-releases/releases
+        </p>
+        <span
+          class="mt-6 inline-flex items-center rounded-xl bg-brand-500 px-6 py-3 text-sm font-semibold text-white"
+        >
+          Abrir descargas →
+        </span>
+      </a>
+    </main>
+
+    <footer class="border-t border-white/10 py-8 text-center text-sm text-slate-400">
+      © <span id="year"></span> ThalmorCoding. Todos los derechos reservados.
+    </footer>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
