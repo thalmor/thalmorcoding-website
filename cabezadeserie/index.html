@@ -585,7 +585,32 @@
         if (!res.ok) throw new Error("Endpoint not live yet");
         const data = await res.json();
         if (data && Array.isArray(data.plans) && data.plans.length > 0) {
-          currentPayload = data;
+          const waPhone = data.contact && data.contact.whatsapp ? data.contact.whatsapp : null;
+          currentPayload = {
+            ...FALLBACK_PAYLOAD,
+            ...data,
+            plans: FALLBACK_PAYLOAD.plans.map((fbPlan) => {
+              const live = data.plans.find((p) => p.id === fbPlan.id) || {};
+              let ctaUrl = live.ctaUrl || fbPlan.ctaUrl;
+              if (waPhone && fbPlan.id !== "starter") {
+                const text = encodeURIComponent(`Hola! Vi Cabeza de Serie en ThalmorCoding.ar y quiero consultar por el plan ${live.label || fbPlan.name}.`);
+                ctaUrl = `https://wa.me/${waPhone}?text=${text}`;
+              }
+              return {
+                ...fbPlan,
+                ...live,
+                name: live.label || live.name || fbPlan.name,
+                priceLabel: live.priceLabel || fbPlan.priceLabel,
+                badge: live.badge || fbPlan.badge,
+                period: live.period || fbPlan.period,
+                audience: live.audience || fbPlan.audience,
+                highlighted: typeof live.highlighted === "boolean" ? live.highlighted : fbPlan.highlighted,
+                features: Array.isArray(live.features) && live.features.length > 0 ? live.features : fbPlan.features,
+                ctaLabel: live.ctaLabel || fbPlan.ctaLabel,
+                ctaUrl
+              };
+            })
+          };
           renderPlans();
           document.getElementById("sync-dot").className = "h-2 w-2 rounded-full bg-emerald-400 animate-pulse";
           document.getElementById("sync-status-text").textContent =

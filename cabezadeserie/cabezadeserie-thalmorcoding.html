@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es-AR" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cabeza de Serie — Gestión de Torneos, Canchas, Abonos y Caja | Thalmor Coding</title>
+  <meta name="description" content="Armá torneos de pádel en 2 minutos (Zonas, Eliminación Directa, Americano), configurá los horarios y franjas de tus canchas a medida, abonos mensuales y la Caja diaria de tu club." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .glass-card {
+      background: rgba(24, 24, 27, 0.78);
+      backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 antialiased selection:bg-emerald-500 selection:text-zinc-950">
+
+  <!-- Top Navbar (Thalmor Coding <-> Cabeza de Serie) -->
+  <header class="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
+      <div class="flex items-center gap-3">
+        <a href="https://thalmorcoding.ar" class="text-xs font-semibold uppercase tracking-widest text-zinc-400 hover:text-white transition">
+          Thalmor Coding
+        </a>
+        <span class="text-zinc-700">/</span>
+        <a href="https://cabezadeserie.com.ar" target="_blank" rel="noreferrer" class="flex items-center gap-2 font-bold text-white">
+          <span class="inline-flex h-6 w-6 items-center justify-center rounded-md bg-emerald-600 text-xs font-black text-white">CS</span>
+          <span>Cabeza de Serie</span>
+        </a>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm text-zinc-300">
+        <a href="#modulos" class="hover:text-emerald-400 transition">Módulos</a>
+        <a href="#calculadora" class="hover:text-emerald-400 transition">Calculadora de Ahorro</a>
+        <a href="#planes" class="hover:text-emerald-400 transition">Planes en Vivo</a>
+        <a href="https://cabezadeserie.com.ar/ranking" target="_blank" rel="noreferrer" class="hover:text-emerald-400 transition">Ranking Oficial</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="https://cabezadeserie.com.ar/login" target="_blank" rel="noreferrer" class="rounded-lg border border-zinc-800 bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-zinc-200 hover:border-zinc-700">
+          Ingresar
+        </a>
+        <a href="https://cabezadeserie.com.ar/registro" target="_blank" rel="noreferrer" class="rounded-lg bg-emerald-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-emerald-500">
+          Crear Cuenta Gratis
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden pt-14 pb-20 px-4 sm:px-6">
+    <div class="mx-auto max-w-6xl text-center">
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold text-emerald-300">
+        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>Desarrollado por Thalmor Coding · Plataforma Web para Clubes y Circuitos</span>
+      </div>
+      <h1 class="mt-6 text-4xl font-black tracking-tight text-white sm:text-6xl leading-[1.08]">
+        Tu club de pádel y tus torneos,<br class="hidden sm:inline" />
+        <span class="text-emerald-400">sin Excel ni caos por WhatsApp.</span>
+      </h1>
+      <p id="product-tagline" class="mx-auto mt-5 max-w-2xl text-base sm:text-lg text-zinc-300 leading-relaxed">
+        Organizá torneos de Zonas, Eliminación Directa o Americano en 2 minutos, publicá tu grilla de canchas con los horarios y franjas que vos elijas y controlá Abonos mensuales y la Caja diaria en un solo lugar.
+      </p>
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <a id="hero-register-btn" href="https://cabezadeserie.com.ar/registro" target="_blank" rel="noreferrer" class="inline-flex h-12 items-center justify-center rounded-xl bg-emerald-600 px-7 text-sm font-bold text-white shadow-lg shadow-emerald-900/40 hover:bg-emerald-500 transition">
+          Probar Gratis con 1 Torneo / mes →
+        </a>
+        <a href="#planes" class="inline-flex h-12 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-900 px-6 text-sm font-semibold text-zinc-100 hover:border-emerald-500 transition">
+          Ver Planes y Precios Actualizados
+        </a>
+        <a id="hero-ranking-btn" href="https://cabezadeserie.com.ar/ranking" target="_blank" rel="noreferrer" class="inline-flex h-12 items-center justify-center rounded-xl border border-emerald-800/60 bg-emerald-950/40 px-5 text-sm font-semibold text-emerald-300 hover:bg-emerald-900/40 transition">
+          Explorar Ranking en Vivo
+        </a>
+      </div>
+
+      <!-- KPI Strip -->
+      <div class="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="rounded-xl border border-zinc-800/90 bg-zinc-900/60 p-4">
+          <p class="text-2xl font-extrabold text-emerald-400">100% Flexible</p>
+          <p class="mt-1 text-xs text-zinc-400">Vos elegís horarios de apertura, cierre y franjas</p>
+        </div>
+        <div class="rounded-xl border border-zinc-800/90 bg-zinc-900/60 p-4">
+          <p class="text-2xl font-extrabold text-white">3 Formatos</p>
+          <p class="mt-1 text-xs text-zinc-400">Zonas + Playoffs, Eliminación y Americano Berger</p>
+        </div>
+        <div class="rounded-xl border border-zinc-800/90 bg-zinc-900/60 p-4">
+          <p class="text-2xl font-extrabold text-emerald-400">5 Niveles</p>
+          <p class="mt-1 text-xs text-zinc-400">Ranking Rango, Ciudad, Provincia, Zonal y Nacional</p>
+        </div>
+        <div class="rounded-xl border border-zinc-800/90 bg-zinc-900/60 p-4">
+          <p class="text-2xl font-extrabold text-white">1 Clic</p>
+          <p class="mt-1 text-xs text-zinc-400">Cobro de turnos y abonos directo en Caja diaria</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Modules Section -->
+  <section id="modulos" class="py-16 px-4 sm:px-6 border-t border-zinc-900 bg-zinc-900/30">
+    <div class="mx-auto max-w-6xl">
+      <div class="text-center">
+        <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Recorrido por la Plataforma</span>
+        <h2 class="mt-2 text-3xl font-extrabold text-white sm:text-4xl">Dos motores integrados para tu club</h2>
+        <p class="mt-2 text-sm text-zinc-400">Elegí un módulo para ver cómo resuelve el día a día del club y de los torneos.</p>
+      </div>
+
+      <div class="mt-8 flex flex-wrap justify-center gap-2" role="tablist">
+        <button onclick="switchModuleTab('canchas')" id="tab-btn-canchas" class="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition">
+          1. Canchas, Turnos Fijos y Link Público
+        </button>
+        <button onclick="switchModuleTab('torneos')" id="tab-btn-torneos" class="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-zinc-300 hover:text-white transition">
+          2. Torneos, Americano y Ranking
+        </button>
+        <button onclick="switchModuleTab('caja')" id="tab-btn-caja" class="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-zinc-300 hover:text-white transition">
+          3. Abonos Mensuales y Caja Diaria
+        </button>
+      </div>
+
+      <!-- Tab 1: Canchas -->
+      <div id="tab-panel-canchas" class="mt-6 rounded-2xl border border-zinc-800 glass-card p-6 sm:p-8">
+        <div class="grid gap-8 lg:grid-cols-2 lg:items-center">
+          <div>
+            <span class="inline-block rounded-md bg-emerald-500/15 px-2.5 py-1 text-xs font-bold text-emerald-300">Módulo Canchas y Turnos</span>
+            <h3 class="mt-3 text-2xl font-bold text-white">Grilla visual de canchas + reservas online sin superposiciones</h3>
+            <p class="mt-3 text-sm leading-relaxed text-zinc-300">
+              Cada club tiene su propio link público <code class="rounded bg-zinc-800 px-1.5 py-0.5 text-emerald-300">/o/tu-club/turnos</code> donde los jugadores ven todas las canchas y horarios libres en grilla y solicitan turno en 15 segundos.
+            </p>
+            <ul class="mt-5 space-y-3 text-sm text-zinc-200">
+              <li class="flex gap-2.5">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span><strong>Liberar solo hoy en un Turno Fijo:</strong> si el grupo de los martes a las 21:00 avisa que hoy no viene, liberás solo esa fecha para venderla sin borrar su turno fijo de las próximas semanas.</span>
+              </li>
+              <li class="flex gap-2.5">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span><strong>Bloqueo automático por Torneo:</strong> los partidos programados en un torneo bloquean la cancha correspondiente en la grilla con etiqueta ámbar.</span>
+              </li>
+              <li class="flex gap-2.5">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span><strong>Horarios y franjas definidos por el dueño:</strong> vos configurás libremente a qué hora abre y cierra tu club, cuánto dura cada turno y qué tarifa aplica en cada franja o día.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="rounded-xl border border-zinc-800 bg-zinc-950 p-4 text-xs shadow-2xl">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3 mb-3">
+              <span class="font-bold text-white">Grilla Operativa del Club · Horarios a Medida</span>
+              <span class="rounded bg-emerald-500/20 px-2 py-0.5 text-emerald-300 font-semibold">En vivo</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2 text-center">
+              <div class="p-2 text-zinc-500 font-semibold">Horario</div>
+              <div class="p-2 font-bold text-zinc-200">Cancha 1</div>
+              <div class="p-2 font-bold text-zinc-200">Cancha 2</div>
+              <div class="p-2 font-bold text-zinc-200">Cancha 3</div>
+
+              <div class="p-2 text-zinc-400 font-medium">19:30</div>
+              <div class="rounded-lg border border-emerald-700/70 bg-emerald-950/60 p-2 text-emerald-200">
+                Gómez · Fijo
+                <span class="block text-[10px] text-emerald-400 font-bold">Abono al día · Pagado</span>
+              </div>
+              <div class="rounded-lg border border-amber-500/70 bg-amber-950/60 p-2 text-amber-200">
+                Torneo 4ta Cat.
+                <span class="block text-[10px] text-amber-400">Cuartos de final</span>
+              </div>
+              <div class="rounded-lg border border-emerald-500 bg-emerald-500/20 p-2 font-bold text-white">
+                ✓ Libre · Reservar
+              </div>
+
+              <div class="p-2 text-zinc-400 font-medium">21:00</div>
+              <div class="rounded-lg border border-sky-600/70 bg-sky-950/60 p-2 text-sky-200">
+                Sosa · Turno del día
+                <span class="block text-[10px] text-sky-400">Pagado · MP</span>
+              </div>
+              <div class="rounded-lg border border-emerald-500 bg-emerald-500/20 p-2 font-bold text-white">
+                ✓ Libre · Reservar
+              </div>
+              <div class="rounded-lg border border-emerald-700/70 bg-emerald-950/60 p-2 text-emerald-200">
+                Quiroga · Fijo
+                <span class="block text-[10px] text-amber-300">Pendiente cobro</span>
+              </div>
+
+              <div class="p-2 text-zinc-400 font-medium">22:30</div>
+              <div class="rounded-lg border border-emerald-500 bg-emerald-500/20 p-2 font-bold text-white">
+                ✓ Libre · Reservar
+              </div>
+              <div class="rounded-lg border border-emerald-500 bg-emerald-500/20 p-2 font-bold text-white">
+                ✓ Libre · Reservar
+              </div>
+              <div class="rounded-lg border border-sky-600/70 bg-sky-950/60 p-2 text-sky-200">
+                Lucero · Día
+                <span class="block text-[10px] text-sky-400">Pagado · Efectivo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Torneos -->
+      <div id="tab-panel-torneos" class="hidden mt-6 rounded-2xl border border-zinc-800 glass-card p-6 sm:p-8">
+        <div class="grid gap-8 lg:grid-cols-2 lg:items-center">
+          <div>
+            <span class="inline-block rounded-md bg-emerald-500/15 px-2.5 py-1 text-xs font-bold text-emerald-300">Módulo Torneos y Ranking</span>
+            <h3 class="mt-3 text-2xl font-bold text-white">Zonas + Playoffs, Eliminación Directa y Americano con método Berger</h3>
+            <p class="mt-3 text-sm leading-relaxed text-zinc-300">
+              Compartís el link por WhatsApp, las parejas se inscriben indicando su disponibilidad horaria y el sistema arma las zonas, cabezas de serie y llaves automáticamente.
+            </p>
+            <ul class="mt-5 space-y-3 text-sm text-zinc-200">
+              <li class="flex gap-2.5">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span><strong>Cabezas de Serie (#1, #2…) y BYEs:</strong> distribuye a los preclasificados en extremos opuestos del cuadro y avanza automáticamente los pases directos.</span>
+              </li>
+              <li class="flex gap-2.5">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span><strong>Americano todos contra todos con fechas Berger:</strong> evita que una pareja juegue 5 partidos seguidos mientras otra espera 2 horas; calcula PJ, PG, PP, Sets, Games y Diferencia en vivo.</span>
+              </li>
+              <li class="flex gap-2.5">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span><strong>Ranking configurable en cascada:</strong> suma puntos al Ranking del Club/Rango, Ciudad, Provincial, Zonal y Nacional.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="rounded-xl border border-zinc-800 bg-zinc-950 p-5 text-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <span class="font-bold text-white">Tabla de Puntos Oficial · /ranking</span>
+              <span class="text-emerald-400 font-semibold">Actualización automática</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2.5 text-center">
+              <div class="rounded-lg border border-emerald-700/50 bg-emerald-950/40 p-3">
+                <p class="text-zinc-400">Campeón</p>
+                <p class="mt-1 text-xl font-black text-emerald-400">100 pts</p>
+              </div>
+              <div class="rounded-lg border border-zinc-800 bg-zinc-900 p-3">
+                <p class="text-zinc-400">Finalista</p>
+                <p class="mt-1 text-xl font-black text-white">60 pts</p>
+              </div>
+              <div class="rounded-lg border border-zinc-800 bg-zinc-900 p-3">
+                <p class="text-zinc-400">Semifinal</p>
+                <p class="mt-1 text-xl font-black text-zinc-200">40 pts</p>
+              </div>
+              <div class="rounded-lg border border-zinc-800 bg-zinc-900 p-3">
+                <p class="text-zinc-400">Cuartos / Octavos</p>
+                <p class="mt-1 text-base font-bold text-zinc-200">25 / 15 pts</p>
+              </div>
+              <div class="rounded-lg border border-zinc-800 bg-zinc-900 p-3">
+                <p class="text-zinc-400">Partido Ganado</p>
+                <p class="mt-1 text-base font-bold text-emerald-300">+10 pts</p>
+              </div>
+              <div class="rounded-lg border border-zinc-800 bg-zinc-900 p-3">
+                <p class="text-zinc-400">Por Presentación</p>
+                <p class="mt-1 text-base font-bold text-zinc-300">+2 pts</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Caja y Abonos -->
+      <div id="tab-panel-caja" class="hidden mt-6 rounded-2xl border border-zinc-800 glass-card p-6 sm:p-8">
+        <div class="grid gap-8 lg:grid-cols-2 lg:items-center">
+          <div>
+            <span class="inline-block rounded-md bg-emerald-500/15 px-2.5 py-1 text-xs font-bold text-emerald-300">Módulo Abonos y Caja</span>
+            <h3 class="mt-3 text-2xl font-bold text-white">Control total de ingresos, kiosco, abonos y gastos del club</h3>
+            <p class="mt-3 text-sm leading-relaxed text-zinc-300">
+              Cada turno cobrado en la grilla o abono mensual registrado entra automáticamente a la Caja diaria, discriminando Efectivo, Transferencia, Mercado Pago, Débito y Crédito.
+            </p>
+            <ul class="mt-5 space-y-3 text-sm text-zinc-200">
+              <li class="flex gap-2.5">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span><strong>Abonos Mensuales en 1 clic:</strong> marcá el abono como pagado desde la pestaña Abonos y todas las semanas del mes quedan cubiertas en la grilla con insignia verde.</span>
+              </li>
+              <li class="flex gap-2.5">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span><strong>Control de Beneficios de Abonados:</strong> llevá la cuenta exacta de beneficios incluidos (ej. tubos de pelotas o bebidas mensuales) entregados en recepción.</span>
+              </li>
+              <li class="flex gap-2.5">
+                <span class="text-emerald-400 font-bold">✓</span>
+                <span><strong>Reversión inteligente:</strong> si se suspende un turno ya cobrado, podés cancelar el turno y revertir el asiento de Caja en el mismo paso.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="rounded-xl border border-zinc-800 bg-zinc-950 p-5 text-xs space-y-3">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <span class="font-bold text-white">Resumen de Caja Diaria · /canchas?view=cash</span>
+              <span class="text-emerald-400 font-semibold">Arqueo en vivo</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2.5">
+              <div class="rounded-lg border border-emerald-700/50 bg-emerald-950/30 p-3">
+                <span class="text-zinc-400">Ingresos</span>
+                <p class="mt-1 text-lg font-extrabold text-emerald-400">$284.000</p>
+              </div>
+              <div class="rounded-lg border border-red-800/50 bg-red-950/20 p-3">
+                <span class="text-zinc-400">Egresos</span>
+                <p class="mt-1 text-lg font-extrabold text-red-400">$38.000</p>
+              </div>
+              <div class="rounded-lg border border-zinc-700 bg-zinc-900 p-3">
+                <span class="text-zinc-400">Balance Neto</span>
+                <p class="mt-1 text-lg font-extrabold text-white">$246.000</p>
+              </div>
+            </div>
+            <div class="rounded-lg border border-zinc-800 bg-zinc-900/70 p-3 space-y-1.5 text-zinc-300">
+              <div class="flex justify-between"><span>Turnos del día + Abonos</span><span class="font-semibold text-white">$210.000</span></div>
+              <div class="flex justify-between"><span>Kiosco / Bebidas + Pelotas</span><span class="font-semibold text-white">$74.000</span></div>
+              <div class="flex justify-between text-zinc-400 pt-1 border-t border-zinc-800"><span>Efectivo / Transferencia / MP</span><span>Discriminado al instante</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Club ROI Calculator -->
+  <section id="calculadora" class="py-16 px-4 sm:px-6 border-t border-zinc-900">
+    <div class="mx-auto max-w-4xl rounded-2xl border border-emerald-800/50 bg-gradient-to-br from-emerald-950/40 via-zinc-900 to-zinc-950 p-6 sm:p-8">
+      <div class="grid gap-8 md:grid-cols-2 md:items-center">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Calculadora para Dueños de Club</span>
+          <h3 class="mt-2 text-2xl font-extrabold text-white">¿Con cuántos turnos recuperás el Plan Plus?</h3>
+          <p class="mt-2 text-sm text-zinc-300">
+            Ajustá el valor promedio de un turno de 90 min en tu club y mirá cuánto representa la suscripción mensual.
+          </p>
+          <div class="mt-5 space-y-4">
+            <label class="block text-xs font-semibold text-zinc-300">
+              Valor promedio del turno en tu club (ARS): <span id="calc-turn-price-label" class="text-emerald-400 font-bold">$24.000</span>
+              <input id="calc-turn-price" type="range" min="12000" max="48000" step="2000" value="24000" oninput="updateCalculator()" class="mt-2 w-full accent-emerald-500" />
+            </label>
+            <label class="block text-xs font-semibold text-zinc-300">
+              Turnos perdidos por mes que recuperás liberando fechas sueltas o por reserva web: <span id="calc-recovered-label" class="text-emerald-400 font-bold">6 turnos/mes</span>
+              <input id="calc-recovered" type="range" min="2" max="20" step="1" value="6" oninput="updateCalculator()" class="mt-2 w-full accent-emerald-500" />
+            </label>
+          </div>
+        </div>
+        <div class="rounded-xl border border-zinc-800 bg-zinc-950 p-5 text-center">
+          <p class="text-xs uppercase tracking-wider text-zinc-400">Ingreso extra estimado recuperado / mes</p>
+          <p id="calc-extra-income" class="mt-2 text-4xl font-black text-emerald-400">$144.000 ARS</p>
+          <p id="calc-breakeven" class="mt-3 text-sm text-zinc-200">
+            Con solo <strong>2,5 turnos al mes</strong> ya cubrís el 100% del Plan Plus ($60.000/mes) y te quedan torneos ilimitados + caja controlada.
+          </p>
+          <a href="#planes" class="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-5 text-xs font-bold text-white hover:bg-emerald-500 transition">
+            Ver Planes Disponibles ↓
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dynamic Live Plans Section -->
+  <section id="planes" class="py-16 px-4 sm:px-6 border-t border-zinc-900">
+    <div class="mx-auto max-w-6xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-3.5 py-1 text-xs text-zinc-300">
+          <span id="sync-dot" class="h-2 w-2 rounded-full bg-emerald-400"></span>
+          <span id="sync-status-text">Sincronizado con cabezadeserie.com.ar/api/public/plans</span>
+        </div>
+        <h2 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">Planes disponibles en Cabeza de Serie</h2>
+        <p class="mt-2 max-w-xl text-sm text-zinc-400">
+          Cuando actualizamos un precio o beneficio en Cabeza de Serie, esta sección en ThalmorCoding.ar se actualiza automáticamente en tiempo real.
+        </p>
+
+        <!-- Audience Filter -->
+        <div class="mt-6 inline-flex rounded-xl border border-zinc-800 bg-zinc-900 p-1 text-xs font-semibold">
+          <button onclick="filterPlans('all')" id="filter-btn-all" class="rounded-lg bg-emerald-600 px-3.5 py-2 text-white transition">Todos los planes</button>
+          <button onclick="filterPlans('club')" id="filter-btn-club" class="rounded-lg px-3.5 py-2 text-zinc-400 hover:text-white transition">Para Clubes con Canchas</button>
+          <button onclick="filterPlans('organizer')" id="filter-btn-organizer" class="rounded-lg px-3.5 py-2 text-zinc-400 hover:text-white transition">Para Organizadores de Torneos</button>
+        </div>
+      </div>
+
+      <!-- Dynamic Cards Container -->
+      <div id="plans-grid" class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-zinc-900 bg-zinc-950 py-10 px-4 sm:px-6 text-center text-xs text-zinc-500">
+    <div class="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>© 2026 <strong>Thalmor Coding</strong> (<a href="https://thalmorcoding.ar" class="underline hover:text-zinc-300">thalmorcoding.ar</a>) · Producto <a href="https://cabezadeserie.com.ar" class="text-emerald-400 underline">cabezadeserie.com.ar</a></p>
+      <div class="flex gap-4">
+        <a href="https://cabezadeserie.com.ar/registro" target="_blank" rel="noreferrer" class="hover:text-zinc-300">Crear cuenta</a>
+        <a href="https://cabezadeserie.com.ar/ranking" target="_blank" rel="noreferrer" class="hover:text-zinc-300">Ranking</a>
+        <a href="https://cabezadeserie.com.ar/privacidad" target="_blank" rel="noreferrer" class="hover:text-zinc-300">Privacidad</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Estado por defecto (espejo exacto de src/lib/domain/license.ts y src/lib/premium.ts)
+    const FALLBACK_PAYLOAD = {
+      product: {
+        name: "Cabeza de Serie",
+        tagline: "Torneos de pádel, grilla de canchas, abonos y caja en un solo lugar",
+        url: "https://cabezadeserie.com.ar",
+        loginUrl: "https://cabezadeserie.com.ar/login",
+        registerUrl: "https://cabezadeserie.com.ar/registro",
+        rankingUrl: "https://cabezadeserie.com.ar/ranking"
+      },
+      plans: [
+        {
+          id: "starter",
+          code: "starter",
+          name: "Starter",
+          badge: "Para empezar",
+          priceLabel: "Gratis",
+          period: "1 torneo publicado / mes",
+          audience: "Clubes u organizadores que quieren probar el sistema en su próximo torneo",
+          highlighted: false,
+          features: [
+            "1 torneo publicado por mes sin cargo",
+            "Zonas + Playoffs, Eliminación Directa y Americano (rondas Berger)",
+            "Cabezas de Serie (#1, #2…) y pases directos (BYEs) automáticos",
+            "Link público de inscripción (/t/torneo/inscribirse)",
+            "Llaves, horarios y tabla de posiciones en vivo desde el celular",
+            "Suma al Ranking (Club, Ciudad, Provincia, Zonal y Nacional)"
+          ],
+          ctaLabel: "Crear cuenta gratis",
+          ctaUrl: "https://cabezadeserie.com.ar/registro"
+        },
+        {
+          id: "premium-tournaments",
+          code: "premium",
+          module: "tournaments",
+          name: "Premium · Torneos",
+          badge: "Organizadores y Circuitos",
+          priceLabel: "$40.000 ARS / mes",
+          period: "por mes · 1 módulo",
+          audience: "Organizadores de circuitos y clubes con calendario continuo de torneos",
+          highlighted: false,
+          features: [
+            "Torneos y categorías ilimitados todo el mes",
+            "Branding propio del club (logo y color de marca)",
+            "Página pública del club (/o/tu-club) con historial y podio de campeones",
+            "Ranking configurable (Rango, Ciudad, Provincial, Zonal y Nacional)",
+            "Programación automática en franjas horarias y plantillas de WhatsApp"
+          ],
+          ctaLabel: "Pedir Módulo Torneos",
+          ctaUrl: "https://cabezadeserie.com.ar/premium"
+        },
+        {
+          id: "premium-courts",
+          code: "premium",
+          module: "courts",
+          name: "Premium · Canchas",
+          badge: "Gestión Diaria del Club",
+          priceLabel: "$40.000 ARS / mes",
+          period: "por mes · 1 módulo",
+          audience: "Clubes que buscan ordenar sus turnos fijos, reservas web, abonos y caja",
+          highlighted: false,
+          features: [
+            "Grilla diaria y semanal (vos elegís horarios de apertura, cierre y duración de turnos)",
+            "Turnos del día y turnos fijos semanales (liberá 1 fecha sin borrar la serie)",
+            "Página pública /o/tu-club/turnos con grilla visual de disponibilidad",
+            "Franjas horarias y tarifas 100% configurables por el dueño + Abonos mensuales",
+            "Caja diaria integrada: canchas, kiosco, pelotas, egresos y balance por medio de pago"
+          ],
+          ctaLabel: "Pedir Módulo Canchas",
+          ctaUrl: "https://cabezadeserie.com.ar/premium"
+        },
+        {
+          id: "plus",
+          code: "plus",
+          module: "all",
+          name: "Plus",
+          badge: "Más elegido · Club Completo",
+          priceLabel: "$60.000 ARS / mes",
+          period: "por mes · los 2 módulos incluidos",
+          audience: "Clubes de pádel que quieren torneos ilimitados + gestión total de canchas y caja",
+          highlighted: true,
+          features: [
+            "Todo el módulo Torneos ilimitados + Todo el módulo Canchas y Turnos",
+            "Integración total: los partidos de torneo bloquean las canchas en la grilla solos",
+            "Páginas públicas unificadas de turnos (/o/club/turnos) y torneos (/o/club)",
+            "Cobro de abonos mensuales en 1 clic e imputación automática en Caja",
+            "Reversión inteligente de cobros al cancelar un turno o liberar una fecha",
+            "Soporte directo por WhatsApp y puesta en marcha asistida"
+          ],
+          ctaLabel: "Activar Plan Plus",
+          ctaUrl: "https://cabezadeserie.com.ar/premium"
+        }
+      ]
+    };
+
+    let currentPayload = FALLBACK_PAYLOAD;
+    let currentFilter = "all";
+
+    function renderPlans() {
+      const container = document.getElementById("plans-grid");
+      const plans = currentPayload.plans.filter((p) => {
+        if (currentFilter === "all") return true;
+        if (currentFilter === "organizer") {
+          return p.id === "starter" || p.id === "premium-tournaments" || p.id === "plus";
+        }
+        return p.id === "premium-courts" || p.id === "plus";
+      });
+
+      container.innerHTML = plans
+        .map(
+          (plan) => `
+        <article class="flex flex-col justify-between rounded-2xl border p-6 transition ${
+          plan.highlighted
+            ? "border-emerald-500 bg-gradient-to-b from-emerald-950/60 to-zinc-900 shadow-xl shadow-emerald-950/30"
+            : "border-zinc-800 bg-zinc-900/60"
+        }">
+          <div>
+            <span class="inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+              plan.highlighted
+                ? "bg-emerald-500 text-zinc-950"
+                : "bg-zinc-800 text-zinc-300"
+            }">${plan.badge}</span>
+            <h3 class="mt-3 text-xl font-bold text-white">${plan.name}</h3>
+            <p class="mt-2 text-2xl font-extrabold text-white">${plan.priceLabel}</p>
+            <p class="text-xs text-zinc-400">${plan.period}</p>
+            <p class="mt-3 text-xs text-zinc-300">${plan.audience}</p>
+            <ul class="mt-5 space-y-2.5 text-xs text-zinc-200">
+              ${plan.features
+                .map(
+                  (f) => `
+                <li class="flex items-start gap-2">
+                  <span class="text-emerald-400 font-bold">✓</span>
+                  <span>${f}</span>
+                </li>
+              `
+                )
+                .join("")}
+            </ul>
+          </div>
+          <a href="${plan.ctaUrl}" target="_blank" rel="noreferrer" class="mt-6 flex h-11 items-center justify-center rounded-xl text-xs font-bold transition ${
+            plan.highlighted
+              ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+              : "bg-zinc-800 text-white hover:bg-zinc-700"
+          }">
+            ${plan.ctaLabel}
+          </a>
+        </article>
+      `
+        )
+        .join("");
+    }
+
+    function filterPlans(filter) {
+      currentFilter = filter;
+      ["all", "club", "organizer"].forEach((id) => {
+        const btn = document.getElementById("filter-btn-" + id);
+        if (id === filter) {
+          btn.className = "rounded-lg bg-emerald-600 px-3.5 py-2 text-white transition";
+        } else {
+          btn.className = "rounded-lg px-3.5 py-2 text-zinc-400 hover:text-white transition";
+        }
+      });
+      renderPlans();
+    }
+
+    function switchModuleTab(tab) {
+      ["canchas", "torneos", "caja"].forEach((t) => {
+        const panel = document.getElementById("tab-panel-" + t);
+        const btn = document.getElementById("tab-btn-" + t);
+        if (t === tab) {
+          panel.classList.remove("hidden");
+          btn.className = "rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition";
+        } else {
+          panel.classList.add("hidden");
+          btn.className = "rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-zinc-300 hover:text-white transition";
+        }
+      });
+    }
+
+    function updateCalculator() {
+      const turnPrice = Number(document.getElementById("calc-turn-price").value);
+      const recovered = Number(document.getElementById("calc-recovered").value);
+      const extra = turnPrice * recovered;
+      const fmt = new Intl.NumberFormat("es-AR").format(turnPrice);
+      const fmtExtra = new Intl.NumberFormat("es-AR").format(extra);
+      const turnsForPlus = (60000 / turnPrice).toFixed(1).replace(".", ",");
+      document.getElementById("calc-turn-price-label").textContent = "$" + fmt;
+      document.getElementById("calc-recovered-label").textContent = recovered + " turnos/mes";
+      document.getElementById("calc-extra-income").textContent = "$" + fmtExtra + " ARS";
+      document.getElementById("calc-breakeven").innerHTML =
+        `Con solo <strong>${turnsForPlus} turnos al mes</strong> ya cubrís el 100% del Plan Plus ($60.000/mes) y te quedan torneos ilimitados + caja controlada.`;
+    }
+
+    async function syncLivePlans() {
+      renderPlans();
+      try {
+        const res = await fetch("https://cabezadeserie.com.ar/api/public/plans", {
+          headers: { Accept: "application/json" },
+          cache: "no-store"
+        });
+        if (!res.ok) throw new Error("Endpoint not live yet");
+        const data = await res.json();
+        if (data && Array.isArray(data.plans) && data.plans.length > 0) {
+          const waPhone = data.contact && data.contact.whatsapp ? data.contact.whatsapp : null;
+          currentPayload = {
+            ...FALLBACK_PAYLOAD,
+            ...data,
+            plans: FALLBACK_PAYLOAD.plans.map((fbPlan) => {
+              const live = data.plans.find((p) => p.id === fbPlan.id) || {};
+              let ctaUrl = live.ctaUrl || fbPlan.ctaUrl;
+              if (waPhone && fbPlan.id !== "starter") {
+                const text = encodeURIComponent(`Hola! Vi Cabeza de Serie en ThalmorCoding.ar y quiero consultar por el plan ${live.label || fbPlan.name}.`);
+                ctaUrl = `https://wa.me/${waPhone}?text=${text}`;
+              }
+              return {
+                ...fbPlan,
+                ...live,
+                name: live.label || live.name || fbPlan.name,
+                priceLabel: live.priceLabel || fbPlan.priceLabel,
+                badge: live.badge || fbPlan.badge,
+                period: live.period || fbPlan.period,
+                audience: live.audience || fbPlan.audience,
+                highlighted: typeof live.highlighted === "boolean" ? live.highlighted : fbPlan.highlighted,
+                features: Array.isArray(live.features) && live.features.length > 0 ? live.features : fbPlan.features,
+                ctaLabel: live.ctaLabel || fbPlan.ctaLabel,
+                ctaUrl
+              };
+            })
+          };
+          renderPlans();
+          document.getElementById("sync-dot").className = "h-2 w-2 rounded-full bg-emerald-400 animate-pulse";
+          document.getElementById("sync-status-text").textContent =
+            "Precios sincronizados en vivo desde cabezadeserie.com.ar";
+        }
+      } catch (e) {
+        document.getElementById("sync-dot").className = "h-2 w-2 rounded-full bg-emerald-400";
+        document.getElementById("sync-status-text").textContent =
+          "Planes oficiales de Cabeza de Serie (sincronización automática lista)";
+      }
+    }
+
+    syncLivePlans();
+  </script>
+</body>
+</html>
