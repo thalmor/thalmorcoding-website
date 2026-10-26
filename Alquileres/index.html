@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es-AR" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Encargado — Sistema de Gestión de Alquileres | Thalmor Coding</title>
+  <meta name="description" content="Plataforma integral para propietarios, administradores e inmobiliarias en Argentina. Contratos con ajuste IPC/ICL/UVA, cuotas, punitorios, portal del inquilino, recibos de servicios, incidencias y reportes RELI/ARCA." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #050811; color: #f8fafc; }
+    .glass-card { background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(16px); border: 1px solid rgba(148, 163, 184, 0.12); }
+    .hero-glow { background: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.18) 0%, rgba(16, 185, 129, 0.10) 40%, rgba(5, 8, 17, 0) 75%); }
+    .plan-popular-glow { box-shadow: 0 0 45px -10px rgba(14, 165, 233, 0.32); }
+  </style>
+</head>
+<body class="antialiased selection:bg-sky-500 selection:text-slate-950">
+
+  <!-- TOP NAVBAR (Integrable en thalmorcoding.ar) -->
+  <header class="sticky top-0 z-50 border-b border-slate-800/80 bg-[#050811]/85 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="https://thalmorcoding.ar" class="text-xs font-semibold tracking-wider uppercase text-slate-400 hover:text-white transition">
+          Thalmor Coding
+        </a>
+        <span class="text-slate-700">/</span>
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse"></span>
+          <span class="font-extrabold tracking-tight text-white text-base">El Encargado</span>
+          <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/30">
+            Gestión de Alquileres
+          </span>
+        </div>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm text-slate-300">
+        <a href="#modulos" class="hover:text-sky-400 transition">Módulos</a>
+        <a href="#portal-inquilino" class="hover:text-sky-400 transition">Portal Inquilino</a>
+        <a href="#calculadora" class="hover:text-sky-400 transition">Calculadora de Ahorro</a>
+        <a href="#planes" class="hover:text-sky-400 transition">Planes en Vivo</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <a href="https://alquileres.thalmorcoding.ar/login" target="_blank" rel="noopener"
+           class="text-xs sm:text-sm font-medium text-slate-300 hover:text-white px-3 py-2 rounded-lg border border-slate-800 hover:border-slate-700 transition">
+          Ingresar
+        </a>
+        <a href="https://alquileres.thalmorcoding.ar/login" target="_blank" rel="noopener"
+           class="text-xs sm:text-sm font-bold bg-sky-500 hover:bg-sky-400 text-slate-950 px-4 py-2 rounded-lg shadow-lg shadow-sky-500/20 transition">
+          Probar 14 días gratis
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. HERO SECTION -->
+  <section class="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-28 hero-glow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs font-medium text-sky-400 mb-6">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+        </span>
+        IPC INDEC e ICL BCRA integrados · Cuotas, Mora, Portal del Inquilino y Reportes RELI/ARCA
+      </div>
+
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white max-w-4xl mx-auto leading-[1.08]">
+        Dejá el Excel atrás.<br />
+        <span class="bg-gradient-to-r from-sky-400 via-emerald-400 to-indigo-400 bg-clip-text text-transparent">
+          Tus alquileres al día, sin perseguir a nadie.
+        </span>
+      </h1>
+
+      <p class="mt-6 text-base sm:text-lg lg:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+        <strong>El Encargado</strong> centraliza tus propiedades, contratos en ARS o USD, cálculo automático de ajustes por <strong>IPC / ICL / UVA</strong>, intereses punitorios, control de boletas de servicios e incidencias con fotos. Incluye un <strong>Portal exclusivo para cada inquilino</strong>.
+      </p>
+
+      <div class="mt-9 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="https://alquileres.thalmorcoding.ar/login" target="_blank" rel="noopener"
+           class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-base shadow-xl shadow-sky-500/25 transition">
+          Crear Cuenta de Propietario (14 días gratis)
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+        <a href="#planes"
+           class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-base border border-slate-700/80 transition">
+          Ver Planes y Precios en Vivo
+        </a>
+      </div>
+
+      <!-- KPI STRIP -->
+      <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+        <div class="glass-card rounded-2xl p-4 text-left">
+          <div class="text-2xl sm:text-3xl font-black text-sky-400">14 Días</div>
+          <div class="text-xs text-slate-400 mt-1">Prueba gratuita automática sin tarjeta de crédito</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-left">
+          <div class="text-2xl sm:text-3xl font-black text-emerald-400">IPC · ICL · UVA</div>
+          <div class="text-xs text-slate-400 mt-1">Ajustes periódicos calculados con índices oficiales</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-left">
+          <div class="text-2xl sm:text-3xl font-black text-indigo-400">Portal 24/7</div>
+          <div class="text-xs text-slate-400 mt-1">El inquilino sube boletas de luz/expensas y reclamos</div>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-left">
+          <div class="text-2xl sm:text-3xl font-black text-amber-400">0% Comisión</div>
+          <div class="text-xs text-slate-400 mt-1">Suscripción fija en ARS por Transferencia CBU/Alias</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. INTERACTIVE MODULES TABS -->
+  <section id="modulos" class="py-16 lg:py-24 border-t border-slate-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <span class="text-xs font-bold uppercase tracking-widest text-sky-400">Recorrido por la Plataforma</span>
+        <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-white">
+          Todo lo que un propietario o estudio necesita en un solo panel
+        </h2>
+        <p class="mt-3 text-slate-400 text-sm sm:text-base">
+          Explorá los 3 pilares de El Encargado: gestión contractual y mora, autogestión del inquilino y rentabilidad real.
+        </p>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="flex flex-wrap justify-center gap-2 mb-10" id="module-tabs">
+        <button onclick="switchModuleTab('contratos')" id="tab-btn-contratos"
+                class="tab-btn px-5 py-3 rounded-xl text-sm font-bold transition bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20">
+          📄 1. Contratos, Cuotas, Mora e IPC/ICL
+        </button>
+        <button onclick="switchModuleTab('inquilinos')" id="tab-btn-inquilinos"
+                class="tab-btn px-5 py-3 rounded-xl text-sm font-bold transition bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700">
+          🔑 2. Portal del Inquilino, Servicios e Incidencias
+        </button>
+        <button onclick="switchModuleTab('reportes')" id="tab-btn-reportes"
+                class="tab-btn px-5 py-3 rounded-xl text-sm font-bold transition bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700">
+          📊 3. Caja de Pagos, Gastos y Rentabilidad RELI
+        </button>
+      </div>
+
+      <!-- Tab Content 1: Contratos, Cuotas y Mora -->
+      <div id="tab-panel-contratos" class="tab-panel glass-card rounded-3xl p-6 sm:p-10">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-6 space-y-5">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/15 text-sky-400 text-xs font-bold">
+              ACTUALIZACIÓN AUTOMÁTICA Y CONTROL DE MORA
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
+              Cuotas mensuales, ajustes IPC/ICL y gestión inteligente de punitorios
+            </h3>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Cargá tus propiedades, unidades y contratos en <strong>ARS o USD</strong>. El sistema genera el cronograma de cuotas, calcula el interés punitorio diario por atraso y te avisa cuando toca actualizar el canon locativo.
+            </p>
+            <ul class="space-y-3 text-sm text-slate-300">
+              <li class="flex items-start gap-2.5">
+                <span class="text-sky-400 font-bold mt-0.5">✓</span>
+                <span><strong>Índices Oficiales en 1 clic:</strong> Consultá y aplicá propuestas de ajuste por <strong>IPC (INDEC)</strong>, <strong>ICL (BCRA)</strong>, UVA o porcentaje fijo cada 3, 4, 6 o 12 meses.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-sky-400 font-bold mt-0.5">✓</span>
+                <span><strong>Modal "Perdonar Mora" flexible:</strong> Elegí entre perdonar solo los intereses punitorios (manteniendo el alquiler base) o condonar el saldo restante sin ensuciar la caja de ingresos.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-sky-400 font-bold mt-0.5">✓</span>
+                <span><strong>Rescisión limpia y borrado en cascada:</strong> Los contratos rescindidos dejan de sumar mora fantasma en el Dashboard y Reportes.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-sky-400 font-bold mt-0.5">✓</span>
+                <span><strong>Inventario de Ingreso y Egreso:</strong> Compará ambiente por ambiente cómo entregaste el inmueble y cómo te lo devuelven, adjuntando el PDF firmado.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="lg:col-span-6">
+            <div class="rounded-2xl bg-slate-950 border border-slate-800 p-5 space-y-4 shadow-2xl">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Unidad 4° B · Palermo</span>
+                  <div class="text-sm font-bold text-white mt-0.5">Contrato Vigente · Ajuste Trimestral ICL</div>
+                </div>
+                <span class="text-[11px] px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold">VIGENTE</span>
+              </div>
+              <div class="space-y-2.5 text-xs">
+                <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                  <div>
+                    <div class="font-bold text-white">Cuota Octubre 2026</div>
+                    <div class="text-slate-400">Vence 10/10/2026 · Pagada por transferencia</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-extrabold text-emerald-400">$ 480.000</div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">PAGADA · Recibo PDF</span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+                  <div>
+                    <div class="font-bold text-white">Cuota Noviembre 2026</div>
+                    <div class="text-amber-300/90">6 días de mora · Punitorios acumulados: $ 14.400</div>
+                  </div>
+                  <div class="text-right space-y-1">
+                    <div class="font-extrabold text-amber-300">$ 494.400</div>
+                    <div class="flex gap-1.5 justify-end">
+                      <span class="text-[10px] px-2 py-0.5 rounded bg-sky-500 text-slate-950 font-bold">Cobrar</span>
+                      <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700 font-semibold">Perdonar mora</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-between">
+                  <div>
+                    <div class="font-bold text-sky-300">Próximo Ajuste Trimestral (ICL BCRA)</div>
+                    <div class="text-slate-400">Propuesta automática lista para aprobar y notificar</div>
+                  </div>
+                  <span class="text-[11px] font-bold text-sky-400">Aplicar ajuste →</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content 2: Portal del Inquilino, Servicios e Incidencias -->
+      <div id="tab-panel-inquilinos" class="tab-panel hidden glass-card rounded-3xl p-6 sm:p-10">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-6 space-y-5">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold">
+              PORTAL DEL INQUILINO (/MI-CUENTA) + WHATSAPP
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
+              No pidas más comprobantes de luz o expensas por WhatsApp
+            </h3>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Desde <strong>/locatarios</strong> invitás a tu inquilino con un clic: el sistema le crea su usuario, genera una clave temporal y abre un mensaje de WhatsApp listo para enviarle su acceso a <strong>/mi-cuenta</strong>.
+            </p>
+            <ul class="space-y-3 text-sm text-slate-300">
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-400 font-bold mt-0.5">✓</span>
+                <span><strong>Control de Servicios por Unidad:</strong> Configurá Luz, Gas, Agua, Expensas o ABL a cargo del inquilino. El inquilino sube el PDF/foto mes a mes y vos podés <strong>Verificar</strong> u <strong>Observar</strong> si la foto es ilegible.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-400 font-bold mt-0.5">✓</span>
+                <span><strong>Incidencias con Fotos del Antes y Después:</strong> El inquilino reporta un desperfecto desde su celular con fotos; vos llevás el estado (<em>Abierta → En curso → Resuelta</em>) y quién asume el costo.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-emerald-400 font-bold mt-0.5">✓</span>
+                <span><strong>Avisos por WhatsApp y Email:</strong> Recordatorios de vencimiento de cuota, avisos de mora y confirmación de recibos.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="lg:col-span-6">
+            <div class="rounded-2xl bg-slate-950 border border-slate-800 p-5 space-y-3 shadow-2xl">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Vista del Inquilino · /mi-cuenta</span>
+                <span class="text-xs text-emerald-400 font-semibold">Acceso aislado y seguro (RLS)</span>
+              </div>
+              <div class="grid sm:grid-cols-2 gap-3 text-xs">
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-slate-400">Boleta de Luz · Octubre</div>
+                  <div class="text-sm font-bold text-white mt-1">$ 25.000 · Comprobante adjunto</div>
+                  <div class="mt-2 inline-block text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">
+                    ✓ VERIFICADO POR PROPIETARIO
+                  </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-slate-400">Expensas Ordinarias · Octubre</div>
+                  <div class="text-sm font-bold text-white mt-1">$ 68.500 · Subido hoy</div>
+                  <div class="mt-2 inline-block text-[10px] px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold">
+                    CARGADO · Pendiente revisión
+                  </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 sm:col-span-2">
+                  <div class="flex justify-between items-center">
+                    <span class="font-bold text-white">🔧 Reclamo: Pérdida en flexible de cocina</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">RESUELTA</span>
+                  </div>
+                  <div class="text-slate-400 mt-1">Fotos del Antes y Después cargadas · Costo $ 15.000 imputado automáticamente a Gastos Deducibles.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content 3: Caja, Gastos y Reportes -->
+      <div id="tab-panel-reportes" class="tab-panel hidden glass-card rounded-3xl p-6 sm:p-10">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-6 space-y-5">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 text-indigo-400 text-xs font-bold">
+              RENTABILIDAD REAL, RECIBOS PDF Y EXPORTACIÓN FISCAL
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
+              Sabé exactamente cuánto rinde cada propiedad limpia de gastos
+            </h3>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Registrá cobros totales o parciales (efectivo, transferencia, depósito o cheque), emití el <strong>Recibo PDF numerado</strong> al instante y descontá los gastos deducibles y reparaciones de cada unidad.
+            </p>
+            <ul class="space-y-3 text-sm text-slate-300">
+              <li class="flex items-start gap-2.5">
+                <span class="text-indigo-400 font-bold mt-0.5">✓</span>
+                <span><strong>Reporte de Rentabilidad Neta:</strong> Ingresos cobrados menos gastos deducibles e incidencias a cargo del propietario, desglosado por mes y por inmueble.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-indigo-400 font-bold mt-0.5">✓</span>
+                <span><strong>Exportación para ARCA / RELI y CSV:</strong> Descargá el padrón de contratos vigentes, partes, fechas y montos listo para tu contador.</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="text-indigo-400 font-bold mt-0.5">✓</span>
+                <span><strong>Multi-Propietario con aislamiento total:</strong> Cada cuenta tiene sus datos 100% blindados mediante políticas Row-Level Security (RLS) en base de datos.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="lg:col-span-6">
+            <div class="rounded-2xl bg-slate-950 border border-slate-800 p-5 space-y-4 shadow-2xl">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Reporte de Rentabilidad y Mora</span>
+                <span class="text-xs text-indigo-400 font-semibold">Exportar CSV / RELI</span>
+              </div>
+              <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-[11px] text-slate-400">Cobrado del Mes</div>
+                  <div class="text-base font-black text-emerald-400 mt-1">$ 2.850.000</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-[11px] text-slate-400">Gastos Deducibles</div>
+                  <div class="text-base font-black text-rose-400 mt-1">- $ 145.000</div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-[11px] text-slate-400">Renta Neta</div>
+                  <div class="text-base font-black text-sky-400 mt-1">$ 2.705.000</div>
+                </div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-xs text-slate-300 flex items-center justify-between">
+                <span>📄 Recibos PDF numerados generados automáticamente en cada cobro</span>
+                <span class="font-bold text-indigo-300">100% Digital</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. CALCULADORA INTERACTIVA DE AHORRO -->
+  <section id="calculadora" class="py-16 lg:py-20 bg-slate-950/60 border-y border-slate-900">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="glass-card rounded-3xl p-6 sm:p-10 border border-sky-500/20">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-5">
+            <span class="text-xs font-bold uppercase tracking-widest text-sky-400">Calculadora para Propietarios y Estudios</span>
+            <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
+              ¿Cuánto tiempo y dinero recuperás al automatizar tus alquileres?
+            </h3>
+            <p class="text-sm text-slate-400">
+              Un solo ajuste IPC/ICL mal calculado o una boleta de expensas impaga no detectada a tiempo cuesta más que todo un año de suscripción.
+            </p>
+
+            <div class="space-y-4 pt-2">
+              <div>
+                <div class="flex justify-between text-xs font-semibold mb-1.5">
+                  <span class="text-slate-300">Cantidad de unidades en alquiler</span>
+                  <span id="calc-unidades-val" class="text-sky-400 font-bold">5 unidades</span>
+                </div>
+                <input id="calc-unidades" type="range" min="1" max="40" value="5" oninput="updateCalculator()"
+                       class="w-full accent-sky-500 cursor-pointer" />
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs font-semibold mb-1.5">
+                  <span class="text-slate-300">Alquiler promedio mensual por unidad (ARS)</span>
+                  <span id="calc-alquiler-val" class="text-sky-400 font-bold">$ 450.000</span>
+                </div>
+                <input id="calc-alquiler" type="range" min="150000" max="1500000" step="50000" value="450000" oninput="updateCalculator()"
+                       class="w-full accent-sky-500 cursor-pointer" />
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5">
+            <div class="rounded-2xl bg-[#050811] border border-slate-800 p-6 text-center space-y-4">
+              <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Volumen Mensual Administrado</div>
+              <div id="calc-volumen" class="text-3xl sm:text-4xl font-black text-white">$ 2.250.000</div>
+              <div class="grid grid-cols-2 gap-2 pt-1 text-left">
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-[10px] text-slate-400 uppercase font-semibold">Tiempo ahorrado</div>
+                  <div id="calc-horas" class="text-sm font-extrabold text-emerald-400 mt-0.5">10 hs / mes</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                  <div class="text-[10px] text-slate-400 uppercase font-semibold">Plan sugerido</div>
+                  <div id="calc-plan-sugerido" class="text-sm font-extrabold text-sky-400 mt-0.5">Plan Pro (0,6% del flujo)</div>
+                </div>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Con <strong class="text-sky-400">El Encargado</strong> invertís menos del <strong>1%</strong> de un solo alquiler para tener contratos, punitorios, servicios e inquilinos 100% controlados.
+              </p>
+              <a href="#planes" class="block w-full py-3 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 font-bold text-xs border border-sky-500/30 transition">
+                Ver planes sincronizados en tiempo real ↓
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. PLANES Y PRECIOS DINÁMICOS (Sincronizados en vivo con El Encargado + Supabase) -->
+  <section id="planes" class="py-16 lg:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-xs font-semibold text-sky-400 mb-3">
+            <span id="sync-dot" class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+            <span id="sync-status-text">Sincronizado en vivo con alquileres.thalmorcoding.ar</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white">
+            Planes y Tarifas Oficiales
+          </h2>
+          <p class="mt-2 text-slate-400 text-sm sm:text-base max-w-2xl">
+            Empezá hoy con <strong>14 días de prueba gratis</strong>. Aboná tu suscripción por <strong>Transferencia Bancaria (CBU / Alias)</strong> sin comisiones ocultas y subí tu comprobante en 1 clic.
+          </p>
+        </div>
+
+        <!-- Controles: Ciclo Mensual / Anual + Filtro de Perfil -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div class="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800">
+            <button onclick="setBillingCycle('MENSUAL')" id="cycle-MENSUAL"
+                    class="cycle-btn px-3.5 py-2 rounded-lg text-xs font-bold transition bg-sky-500 text-slate-950">
+              Ciclo Mensual
+            </button>
+            <button onclick="setBillingCycle('ANUAL')" id="cycle-ANUAL"
+                    class="cycle-btn px-3.5 py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+              Anual <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">2 meses OFF</span>
+            </button>
+          </div>
+
+          <div class="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800">
+            <button onclick="filterPlans('ALL')" id="filter-ALL"
+                    class="plan-filter-btn px-3 py-2 rounded-lg text-xs font-bold transition bg-slate-800 text-white">
+              Todos
+            </button>
+            <button onclick="filterPlans('INDIVIDUAL')" id="filter-INDIVIDUAL"
+                    class="plan-filter-btn px-3 py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+              Dueño Directo
+            </button>
+            <button onclick="filterPlans('INMOBILIARIA')" id="filter-INMOBILIARIA"
+                    class="plan-filter-btn px-3 py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+              Estudios / Inmobiliarias
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner de Medio de Pago Activo -->
+      <div id="payment-methods-banner" class="mb-8 rounded-2xl bg-slate-900/75 border border-slate-800 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2.5 text-slate-300">
+          <span class="px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30">
+            ✓ Transferencia CBU / Alias Habilitada
+          </span>
+          <span>Activación rápida adjuntando tu comprobante desde <strong>/suscripcion</strong>.</span>
+        </div>
+        <div class="text-slate-400">
+          ¿Tenés más de 60 unidades o requerís migración asistida? <a href="https://wa.me/5491130322719?text=Hola%20Adolfo!%20Me%20interesa%20El%20Encargado%20para%20administrar%20alquileres." target="_blank" rel="noopener" class="text-sky-400 font-semibold hover:underline">Hablemos por WhatsApp →</a>
+        </div>
+      </div>
+
+      <!-- Contenedor Dinámico de Tarjetas de Planes -->
+      <div id="plans-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Se inyecta dinámicamente desde la API de El Encargado / Supabase plan_plataforma o el fallback inmediato -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. FOOTER CTA -->
+  <footer class="border-t border-slate-900 py-12 bg-[#03050b]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+          <span class="font-bold text-white">El Encargado · Gestión de Alquileres</span>
+          <span class="text-xs text-slate-500">un desarrollo de Thalmor Coding</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">
+          Sincronización dinámica de planes en tiempo real con <code class="text-slate-400">alquileres.thalmorcoding.ar</code> y Supabase <code class="text-slate-400">plan_plataforma</code>.
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://thalmorcoding.ar" class="text-xs text-slate-400 hover:text-white transition">← Volver a ThalmorCoding.ar</a>
+        <a href="https://alquileres.thalmorcoding.ar/login" target="_blank" rel="noopener"
+           class="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition">
+          Abrir Plataforma Web →
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- LOGICA JS: TABS, CALCULADORA Y FETCH EN VIVO DESDE ALQUILERES.THALMORCODING.AR + SUPABASE -->
+  <script>
+    const ALQUILERES_API_URL = 'https://alquileres.thalmorcoding.ar/api/public/plans';
+    const SUPABASE_REST_PLANS_URL = 'https://gpeptcscrpsbzsyvkjou.supabase.co/rest/v1/plan_plataforma?select=codigo,nombre,descripcion,max_unidades,precio_mensual_ars,precio_anual_ars,activo,orden&activo=eq.true&order=orden.asc';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwZXB0Y3NjcnBzYnpzeXZram91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3MTkxODksImV4cCI6MjEwMjI5NTE4OX0.WLlAX6J4afk3NJiwS2eUQJzc5qYi5wDdmIgVp68Co5A'.replace(/\s+/g, '');
+
+    // Espejo de respaldo inmediato (refleja exactamente public.plan_plataforma de El Encargado)
+    const FALLBACK_PAYLOAD = {
+      product: {
+        id: 'el-encargado',
+        name: 'El Encargado',
+        registerUrl: 'https://alquileres.thalmorcoding.ar/login'
+      },
+      paymentConfig: {
+        transferencia_habilitada: true,
+        mercadopago_habilitado: false
+      },
+      plans: [
+        {
+          id: 'trial-14d',
+          code: 'PRUEBA',
+          name: 'Prueba Gratis 14 Días',
+          targetProfile: 'INDIVIDUAL',
+          maxUnits: 3,
+          monthlyPriceArs: 0,
+          annualPriceArs: 0,
+          badge: 'Automático al registrarte',
+          isPopular: false,
+          description: 'Probá toda la plataforma con tus propios contratos e inquilinos durante 14 días sin compromiso.',
+          features: [
+            'Hasta 3 unidades en alquiler durante la prueba',
+            'Contratos en ARS o USD con ajuste IPC / ICL',
+            'Portal del Inquilino (/mi-cuenta) con invitación WhatsApp',
+            'Recibos de servicios, incidencias con fotos e inventario',
+            'Sin tarjeta de crédito para empezar'
+          ],
+          ctaText: 'Crear Cuenta Gratis',
+          ctaUrl: 'https://alquileres.thalmorcoding.ar/login'
+        },
+        {
+          id: 'plan-inicial',
+          code: 'INICIAL',
+          name: 'Plan Inicial',
+          targetProfile: 'INDIVIDUAL',
+          maxUnits: 3,
+          monthlyPriceArs: 15000,
+          annualPriceArs: 150000,
+          badge: 'Ideal Dueño Directo',
+          isPopular: false,
+          description: 'Para propietarios particulares que administran hasta 3 departamentos, casas o cocheras.',
+          features: [
+            'Hasta 3 unidades activas en alquiler',
+            'Cronograma de cuotas, cobros y Recibos PDF',
+            'Cálculo de mora + botón "Perdonar mora"',
+            'Control mensual de Luz, Gas, Agua y Expensas',
+            'Soporte y pago por Transferencia CBU / Alias'
+          ],
+          ctaText: 'Elegir Plan Inicial',
+          ctaUrl: 'https://alquileres.thalmorcoding.ar/login?plan=INICIAL'
+        },
+        {
+          id: 'plan-pro',
+          code: 'PRO',
+          name: 'Plan Pro',
+          targetProfile: 'INDIVIDUAL',
+          maxUnits: 15,
+          monthlyPriceArs: 30000,
+          annualPriceArs: 300000,
+          badge: 'Más Elegido',
+          isPopular: true,
+          description: 'Para rentistas y administradores con cartera mediana que buscan automatizar ajustes y cobranzas.',
+          features: [
+            'Hasta 15 unidades activas en alquiler',
+            'Ajustes automáticos IPC (INDEC) e ICL (BCRA)',
+            'Portal del Inquilino ilimitado con carga de boletas',
+            'Incidencias con fotos Antes/Después + Gastos deducibles',
+            'Reporte de Rentabilidad Neta y exportación RELI / ARCA'
+          ],
+          ctaText: 'Elegir Plan Pro',
+          ctaUrl: 'https://alquileres.thalmorcoding.ar/login?plan=PRO'
+        },
+        {
+          id: 'plan-estudio',
+          code: 'ESTUDIO',
+          name: 'Plan Estudio / Inmobiliaria',
+          targetProfile: 'INMOBILIARIA',
+          maxUnits: 60,
+          monthlyPriceArs: 60000,
+          annualPriceArs: 600000,
+          badge: 'Cartera Completa',
+          isPopular: false,
+          description: 'Para estudios contables, jurídicos o inmobiliarias que gestionan múltiples propiedades y edificios.',
+          features: [
+            'Hasta 60 unidades activas en alquiler',
+            'Gestión integral de edificios, PH, locales y cocheras',
+            'Inventarios digitales de Ingreso y Egreso con acta PDF',
+            'Bandeja centralizada de recibos de servicios y mora',
+            'Atención prioritaria y puesta en marcha asistida'
+          ],
+          ctaText: 'Elegir Plan Estudio',
+          ctaUrl: 'https://alquileres.thalmorcoding.ar/login?plan=ESTUDIO'
+        }
+      ]
+    };
+
+    let currentPlans = FALLBACK_PAYLOAD.plans;
+    let currentFilter = 'ALL';
+    let currentCycle = 'MENSUAL';
+
+    function formatARS(amount) {
+      if (!amount || amount === 0) return 'Gratis';
+      return '$ ' + Number(amount).toLocaleString('es-AR');
+    }
+
+    function normalizeDbRowsToPlans(rows) {
+      if (!Array.isArray(rows) || rows.length === 0) return null;
+      const trialCard = FALLBACK_PAYLOAD.plans[0];
+      const mapped = rows.map((row) => {
+        const code = String(row.codigo || '').toUpperCase();
+        const fallbackMatch = FALLBACK_PAYLOAD.plans.find((p) => p.code === code) || {};
+        const maxU = Number(row.max_unidades || fallbackMatch.maxUnits || 10);
+        return {
+          id: 'plan-' + code.toLowerCase(),
+          code,
+          name: row.nombre || fallbackMatch.name || code,
+          targetProfile: maxU > 15 ? 'INMOBILIARIA' : 'INDIVIDUAL',
+          maxUnits: maxU,
+          monthlyPriceArs: Number(row.precio_mensual_ars ?? fallbackMatch.monthlyPriceArs ?? 0),
+          annualPriceArs: Number(row.precio_anual_ars ?? fallbackMatch.annualPriceArs ?? 0),
+          badge: fallbackMatch.badge || ('Hasta ' + maxU + ' unidades'),
+          isPopular: code === 'PRO',
+          description: row.descripcion || fallbackMatch.description || ('Hasta ' + maxU + ' unidades en alquiler.'),
+          features: [
+            'Hasta ' + maxU + ' unidades activas en alquiler',
+            ...(fallbackMatch.features ? fallbackMatch.features.slice(1) : [
+              'Contratos con ajuste IPC / ICL y recibos PDF',
+              'Portal del Inquilino (/mi-cuenta) incluido',
+              'Control de boletas de servicios e incidencias',
+              'Pago por Transferencia CBU / Alias sin comisión'
+            ])
+          ],
+          ctaText: 'Elegir ' + (row.nombre || code),
+          ctaUrl: 'https://alquileres.thalmorcoding.ar/login?plan=' + encodeURIComponent(code)
+        };
+      });
+      return [trialCard, ...mapped];
+    }
+
+    function renderPlans() {
+      const grid = document.getElementById('plans-grid');
+      const filtered = currentFilter === 'ALL'
+        ? currentPlans
+        : currentPlans.filter((p) => p.targetProfile === currentFilter || p.code === 'PRUEBA');
+
+      grid.innerHTML = filtered.map((plan) => {
+        const isTrial = plan.monthlyPriceArs === 0;
+        const priceToShow = isTrial
+          ? 0
+          : (currentCycle === 'ANUAL' ? plan.annualPriceArs : plan.monthlyPriceArs);
+        const periodLabel = isTrial
+          ? 'por 14 días'
+          : (currentCycle === 'ANUAL' ? '/ año (ahorrás 2 meses)' : '/ mes · Transferencia ARS');
+
+        const popularClasses = plan.isPopular
+          ? 'border-sky-500/70 plan-popular-glow bg-slate-900/90'
+          : 'border-slate-800 bg-slate-900/50 hover:border-slate-700';
+
+        const btnClasses = plan.isPopular
+          ? 'bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold shadow-lg shadow-sky-500/20'
+          : 'bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-700';
+
+        const featuresHtml = (plan.features || []).map((f) => `
+          <li class="flex items-start gap-2 text-xs text-slate-300">
+            <span class="text-sky-400 font-bold mt-0.5">✓</span>
+            <span>${f}</span>
+          </li>
+        `).join('');
+
+        return `
+          <div class="rounded-2xl border ${popularClasses} p-6 flex flex-col justify-between transition">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${plan.isPopular ? 'bg-sky-500 text-slate-950' : 'bg-slate-800 text-slate-300'}">
+                  ${plan.badge}
+                </span>
+                <span class="text-[11px] font-semibold text-sky-400">
+                  Hasta ${plan.maxUnits} unid.
+                </span>
+              </div>
+
+              <h3 class="text-xl font-extrabold text-white">${plan.name}</h3>
+              <p class="text-xs text-slate-400 mt-1.5 min-h-[34px]">${plan.description}</p>
+
+              <div class="mt-5 pb-5 border-b border-slate-800">
+                <div class="text-3xl font-black text-white">${formatARS(priceToShow)}</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">${periodLabel}</div>
+              </div>
+
+              <ul class="mt-5 space-y-2.5">
+                ${featuresHtml}
+              </ul>
+            </div>
+
+            <div class="mt-7 pt-4 border-t border-slate-800/60">
+              <a href="${plan.ctaUrl || 'https://alquileres.thalmorcoding.ar/login'}" target="_blank" rel="noopener"
+                 class="w-full inline-flex items-center justify-center py-3 px-4 rounded-xl text-xs transition ${btnClasses}">
+                ${plan.ctaText || 'Comenzar Ahora'} →
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setBillingCycle(cycle) {
+      currentCycle = cycle;
+      ['MENSUAL', 'ANUAL'].forEach((c) => {
+        const btn = document.getElementById('cycle-' + c);
+        if (!btn) return;
+        if (c === cycle) {
+          btn.className = 'cycle-btn px-3.5 py-2 rounded-lg text-xs font-bold transition bg-sky-500 text-slate-950';
+        } else {
+          btn.className = 'cycle-btn px-3.5 py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+        }
+      });
+      renderPlans();
+    }
+
+    function filterPlans(filter) {
+      currentFilter = filter;
+      ['ALL', 'INDIVIDUAL', 'INMOBILIARIA'].forEach((key) => {
+        const btn = document.getElementById('filter-' + key);
+        if (!btn) return;
+        if (key === filter) {
+          btn.className = 'plan-filter-btn px-3 py-2 rounded-lg text-xs font-bold transition bg-slate-800 text-white';
+        } else {
+          btn.className = 'plan-filter-btn px-3 py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+        }
+      });
+      renderPlans();
+    }
+
+    function switchModuleTab(tabKey) {
+      ['contratos', 'inquilinos', 'reportes'].forEach((k) => {
+        const panel = document.getElementById('tab-panel-' + k);
+        const btn = document.getElementById('tab-btn-' + k);
+        if (k === tabKey) {
+          panel.classList.remove('hidden');
+          btn.className = 'tab-btn px-5 py-3 rounded-xl text-sm font-bold transition bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20';
+        } else {
+          panel.classList.add('hidden');
+          btn.className = 'tab-btn px-5 py-3 rounded-xl text-sm font-bold transition bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700';
+        }
+      });
+    }
+
+    function updateCalculator() {
+      const unidades = Number(document.getElementById('calc-unidades').value);
+      const alquiler = Number(document.getElementById('calc-alquiler').value);
+      document.getElementById('calc-unidades-val').textContent = unidades + (unidades === 1 ? ' unidad' : ' unidades');
+      document.getElementById('calc-alquiler-val').textContent = '$ ' + alquiler.toLocaleString('es-AR');
+
+      const volumen = unidades * alquiler;
+      document.getElementById('calc-volumen').textContent = '$ ' + volumen.toLocaleString('es-AR');
+      document.getElementById('calc-horas').textContent = Math.max(2, unidades * 2) + ' hs / mes';
+
+      const plan = unidades <= 3
+        ? { nombre: 'Plan Inicial', precio: 15000 }
+        : (unidades <= 15 ? { nombre: 'Plan Pro', precio: 30000 } : { nombre: 'Plan Estudio', precio: 60000 });
+
+      const pct = ((plan.precio / Math.max(1, volumen)) * 100).toFixed(1).replace('.', ',');
+      document.getElementById('calc-plan-sugerido').textContent = `${plan.nombre} (${pct}% del flujo)`;
+    }
+
+    async function syncLivePlans() {
+      renderPlans();
+      const statusText = document.getElementById('sync-status-text');
+
+      // 1) Intentar endpoint público de El Encargado (/api/public/plans)
+      try {
+        const res = await fetch(ALQUILERES_API_URL, { headers: { 'Accept': 'application/json' } });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.plans) && data.plans.length > 0) {
+            currentPlans = data.plans;
+            renderPlans();
+            statusText.textContent = 'Planes actualizados en tiempo real desde alquileres.thalmorcoding.ar';
+            return;
+          }
+          if (data && Array.isArray(data.plan_plataforma) && data.plan_plataforma.length > 0) {
+            const normalized = normalizeDbRowsToPlans(data.plan_plataforma);
+            if (normalized) {
+              currentPlans = normalized;
+              renderPlans();
+              statusText.textContent = 'Planes actualizados en tiempo real desde alquileres.thalmorcoding.ar';
+              return;
+            }
+          }
+        }
+      } catch (_) {}
+
+      // 2) Fallback directo a Supabase REST (public.plan_plataforma)
+      try {
+        const supRes = await fetch(SUPABASE_REST_PLANS_URL, {
+          headers: {
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwZXB0Y3NjcnBzYnpzeXZram91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3MTkxODksImV4cCI6MjEwMjI5NTE4OX0.WLlAX6J4afk3NJiwS2eUQJzc5qYi5wDdmIgVp68Co5A',
+            'Accept': 'application/json'
+          }
+        });
+        if (supRes.ok) {
+          const rows = await supRes.json();
+          const normalized = normalizeDbRowsToPlans(rows);
+          if (normalized && normalized.length > 1) {
+            currentPlans = normalized;
+            renderPlans();
+            statusText.textContent = 'Planes sincronizados en vivo desde Supabase (plan_plataforma)';
+            return;
+          }
+        }
+      } catch (_) {}
+
+      statusText.textContent = 'Planes oficiales de El Encargado (alquileres.thalmorcoding.ar)';
+    }
+
+    updateCalculator();
+    syncLivePlans();
+  </script>
+</body>
+</html>
