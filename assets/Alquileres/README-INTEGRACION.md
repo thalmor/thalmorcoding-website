@@ -8,7 +8,7 @@ En este paquete tenés todo listo para publicar la página de **El Encargado –
 
 1. **`alquileres-landing.html`** (también copiado en `/workspace/alquileres-thalmorcoding.html`)
    - Página web completa (HTML5 + Tailwind CSS CDN + tipografía `Inter` + estética oscura `bg-slate-950` y acentos `sky`/`brand` idéntica a `thalmorcoding.ar` y a `cabezadeserie-landing.html`).
-   - Lista para subir como `/Alquileres/index.html` (siguiendo el mismo patrón de `/Baqueano/index.html` y `/DictadoEcografico/index.html` en `thalmorcoding.ar`).
+   - Lista para subir como `/Alquileres/index.html` (siguiendo el mismo patrón de `/Baqueano/index.html` y `/cabezadeserie/index.html` en `thalmorcoding.ar`).
    - **Sincronización doble en vivo (`syncLivePlans()`):**
      1. Consulta primero `https://alquileres.thalmorcoding.ar/api/public/plans`.
      2. Si el endpoint aún no está desplegado, consulta directamente la API REST de Supabase (`https://gpeptcscrpsbzsyvkjou.supabase.co/rest/v1/plan_plataforma?activo=eq.true&order=orden.asc`) usando la `anon` key pública.
