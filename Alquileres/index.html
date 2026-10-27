@@ -82,7 +82,7 @@
         </a>
         <a href="https://alquileres.thalmorcoding.ar/login" target="_blank" rel="noopener"
            class="text-xs sm:text-sm font-bold bg-sky-500 hover:bg-sky-400 text-slate-950 px-4 py-2 rounded-lg shadow-lg shadow-sky-500/20 transition">
-          Probar 14 días gratis
+          Empezá gratis
         </a>
       </div>
     </div>
@@ -113,7 +113,7 @@
       <div class="mt-9 flex flex-col sm:flex-row items-center justify-center gap-4">
         <a href="https://alquileres.thalmorcoding.ar/login" target="_blank" rel="noopener"
            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-base shadow-xl shadow-sky-500/25 transition">
-          Crear Cuenta de Propietario (14 días gratis)
+          Crear cuenta gratis: tu 1er depto sin vencimiento
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
         </a>
         <a href="#planes"
@@ -450,7 +450,7 @@
             Planes y Tarifas Oficiales
           </h2>
           <p class="mt-2 text-slate-400 text-sm sm:text-base max-w-2xl">
-            Empezá hoy con <strong>14 días de prueba gratis</strong>. Aboná tu suscripción por <strong>Transferencia Bancaria (CBU / Alias)</strong> sin comisiones ocultas y subí tu comprobante en 1 clic.
+            Tu <strong>primer departamento es gratis y sin vencimiento</strong>. Cuando necesites más unidades, aboná tu plan por <strong>Transferencia Bancaria (CBU / Alias)</strong> sin comisiones ocultas y subí tu comprobante en 1 clic.
           </p>
         </div>
 
@@ -463,7 +463,7 @@
             </button>
             <button onclick="setBillingCycle('ANUAL')" id="cycle-ANUAL"
                     class="cycle-btn px-3.5 py-2 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
-              Anual <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">2 meses OFF</span>
+              Anual <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Con descuento</span>
             </button>
           </div>
 
@@ -530,109 +530,40 @@
   <!-- LOGICA JS: TABS, CALCULADORA Y FETCH EN VIVO DESDE ALQUILERES.THALMORCODING.AR + SUPABASE -->
   <script>
     const ALQUILERES_API_URL = 'https://alquileres.thalmorcoding.ar/api/public/plans';
-    const SUPABASE_REST_PLANS_URL = 'https://gpeptcscrpsbzsyvkjou.supabase.co/rest/v1/plan_plataforma?select=codigo,nombre,descripcion,max_unidades,precio_mensual_ars,precio_anual_ars,activo,orden&activo=eq.true&order=orden.asc';
+    const SUPABASE_REST_PLANS_URL = 'https://gpeptcscrpsbzsyvkjou.supabase.co/rest/v1/plan_plataforma?select=codigo,nombre,descripcion,max_unidades,precio_mensual_ars,precio_anual_ars,activo,orden,sin_vencimiento,es_plan_registro&activo=eq.true&order=orden.asc';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwZXB0Y3NjcnBzYnpzeXZram91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3MTkxODksImV4cCI6MjEwMjI5NTE4OX0.WLlAX6J4afk3NJiwS2eUQJzc5qYi5wDdmIgVp68Co5A'.replace(/\s+/g, '');
 
-    // Espejo de respaldo inmediato (refleja exactamente public.plan_plataforma de El Encargado)
-    const FALLBACK_PAYLOAD = {
-      product: {
-        id: 'el-encargado',
-        name: 'El Encargado',
-        registerUrl: 'https://alquileres.thalmorcoding.ar/login'
-      },
-      paymentConfig: {
-        transferencia_habilitada: true,
-        mercadopago_habilitado: false
-      },
-      plans: [
-        {
-          id: 'trial-14d',
-          code: 'PRUEBA',
-          name: 'Prueba Gratis 14 Días',
-          targetProfile: 'INDIVIDUAL',
-          maxUnits: 3,
-          monthlyPriceArs: 0,
-          annualPriceArs: 0,
-          badge: 'Automático al registrarte',
-          isPopular: false,
-          description: 'Probá toda la plataforma con tus propios contratos e inquilinos durante 14 días sin compromiso.',
-          features: [
-            'Hasta 3 unidades en alquiler durante la prueba',
-            'Contratos en ARS o USD con ajuste IPC / ICL',
-            'Portal del Inquilino (/mi-cuenta) con invitación WhatsApp',
-            'Recibos de servicios, incidencias con fotos e inventario',
-            'Sin tarjeta de crédito para empezar'
-          ],
-          ctaText: 'Crear Cuenta Gratis',
-          ctaUrl: 'https://alquileres.thalmorcoding.ar/login'
-        },
-        {
-          id: 'plan-inicial',
-          code: 'INICIAL',
-          name: 'Plan Inicial',
-          targetProfile: 'INDIVIDUAL',
-          maxUnits: 3,
-          monthlyPriceArs: 15000,
-          annualPriceArs: 150000,
-          badge: 'Ideal Dueño Directo',
-          isPopular: false,
-          description: 'Para propietarios particulares que administran hasta 3 departamentos, casas o cocheras.',
-          features: [
-            'Hasta 3 unidades activas en alquiler',
-            'Cronograma de cuotas, cobros y Recibos PDF',
-            'Cálculo de mora + botón "Perdonar mora"',
-            'Control mensual de Luz, Gas, Agua y Expensas',
-            'Soporte y pago por Transferencia CBU / Alias'
-          ],
-          ctaText: 'Elegir Plan Inicial',
-          ctaUrl: 'https://alquileres.thalmorcoding.ar/login?plan=INICIAL'
-        },
-        {
-          id: 'plan-pro',
-          code: 'PRO',
-          name: 'Plan Pro',
-          targetProfile: 'INDIVIDUAL',
-          maxUnits: 15,
-          monthlyPriceArs: 30000,
-          annualPriceArs: 300000,
-          badge: 'Más Elegido',
-          isPopular: true,
-          description: 'Para rentistas y administradores con cartera mediana que buscan automatizar ajustes y cobranzas.',
-          features: [
-            'Hasta 15 unidades activas en alquiler',
-            'Ajustes automáticos IPC (INDEC) e ICL (BCRA)',
-            'Portal del Inquilino ilimitado con carga de boletas',
-            'Incidencias con fotos Antes/Después + Gastos deducibles',
-            'Reporte de Rentabilidad Neta y exportación CSV para tu contador'
-          ],
-          ctaText: 'Elegir Plan Pro',
-          ctaUrl: 'https://alquileres.thalmorcoding.ar/login?plan=PRO'
-        },
-        {
-          id: 'plan-estudio',
-          code: 'ESTUDIO',
-          name: 'Plan Estudio / Inmobiliaria',
-          targetProfile: 'INMOBILIARIA',
-          maxUnits: 60,
-          monthlyPriceArs: 60000,
-          annualPriceArs: 600000,
-          badge: 'Cartera Completa',
-          isPopular: false,
-          description: 'Para estudios contables, jurídicos o inmobiliarias que gestionan múltiples propiedades y edificios.',
-          features: [
-            'Hasta 60 unidades activas en alquiler',
-            'Gestión integral de edificios, PH, locales y cocheras',
-            'Inventarios digitales de Ingreso y Egreso con acta PDF',
-            'Bandeja centralizada de recibos de servicios y mora',
-            'Atención prioritaria y puesta en marcha asistida'
-          ],
-          ctaText: 'Elegir Plan Estudio',
-          ctaUrl: 'https://alquileres.thalmorcoding.ar/login?plan=ESTUDIO'
-        }
-      ]
-    };
+    // Respaldo si no responde la API: refleja los planes cargados en Admin SaaS.
+    // La fuente real es /api/public/plans (planes activos de plan_plataforma).
+    const FALLBACK_ROWS = [
+      { codigo: 'FREE', nombre: 'Gratis (1 unidad)', descripcion: 'Tu primer departamento, gratis y sin vencimiento.', max_unidades: 1, precio_mensual_ars: 0, precio_anual_ars: 0, orden: 0, sin_vencimiento: true, es_plan_registro: true },
+      { codigo: 'INICIAL', nombre: 'Plan Inicial', descripcion: 'Para propietarios con pocas unidades.', max_unidades: 3, precio_mensual_ars: 15000, precio_anual_ars: 157500, orden: 1, sin_vencimiento: false, es_plan_registro: false },
+      { codigo: 'PRO', nombre: 'Plan Pro', descripcion: 'Para carteras medianas.', max_unidades: 15, precio_mensual_ars: 35000, precio_anual_ars: 367500, orden: 2, sin_vencimiento: false, es_plan_registro: false },
+      { codigo: 'ESTUDIO_50', nombre: 'Estudio 50', descripcion: 'Para contadores y administradores.', max_unidades: 50, precio_mensual_ars: 75000, precio_anual_ars: 787500, orden: 3, sin_vencimiento: false, es_plan_registro: false },
+      { codigo: 'ESTUDIO_100', nombre: 'Estudio 100', descripcion: 'Para inmobiliarias y estudios con cartera mediana.', max_unidades: 100, precio_mensual_ars: 130000, precio_anual_ars: 1365000, orden: 4, sin_vencimiento: false, es_plan_registro: false }
+    ];
 
-    let currentPlans = FALLBACK_PAYLOAD.plans;
+    const REGISTER_URL = 'https://alquileres.thalmorcoding.ar/login';
+
+    const FEATURES_GRATIS = [
+      'Tu primer departamento, casa o cochera',
+      'Ajustes automáticos por IPC (INDEC), ICL y UVA (BCRA)',
+      'Portal del Inquilino con invitación por WhatsApp',
+      'Control de boletas de servicios e incidencias con fotos',
+      'Sin tarjeta y sin vencimiento'
+    ];
+
+    function featuresPago(maxU) {
+      return [
+        maxU == null ? 'Unidades ilimitadas' : 'Hasta ' + maxU + ' unidades activas en alquiler',
+        'Contratos en ARS o USD con ajuste IPC / ICL / UVA',
+        'Cuotas, cobros, mora y recibos PDF',
+        'Portal del Inquilino e inventario con fotos',
+        'Reportes de rentabilidad y CSV para tu contador'
+      ];
+    }
+
+    let currentPlans = [];
     let currentFilter = 'ALL';
     let currentCycle = 'MENSUAL';
 
@@ -643,58 +574,66 @@
 
     function normalizeDbRowsToPlans(rows) {
       if (!Array.isArray(rows) || rows.length === 0) return null;
-      const trialCard = FALLBACK_PAYLOAD.plans[0];
-      const mapped = rows.map((row) => {
-        const code = String(row.codigo || '').toUpperCase();
-        const fallbackMatch = FALLBACK_PAYLOAD.plans.find((p) => p.code === code) || {};
-        const maxU = Number(row.max_unidades || fallbackMatch.maxUnits || 10);
-        return {
-          id: 'plan-' + code.toLowerCase(),
-          code,
-          name: row.nombre || fallbackMatch.name || code,
-          targetProfile: maxU > 15 ? 'INMOBILIARIA' : 'INDIVIDUAL',
-          maxUnits: maxU,
-          monthlyPriceArs: Number(row.precio_mensual_ars ?? fallbackMatch.monthlyPriceArs ?? 0),
-          annualPriceArs: Number(row.precio_anual_ars ?? fallbackMatch.annualPriceArs ?? 0),
-          badge: fallbackMatch.badge || ('Hasta ' + maxU + ' unidades'),
-          isPopular: code === 'PRO',
-          description: row.descripcion || fallbackMatch.description || ('Hasta ' + maxU + ' unidades en alquiler.'),
-          features: [
-            'Hasta ' + maxU + ' unidades activas en alquiler',
-            ...(fallbackMatch.features ? fallbackMatch.features.slice(1) : [
-              'Contratos con ajuste IPC / ICL y recibos PDF',
-              'Portal del Inquilino (/mi-cuenta) incluido',
-              'Control de boletas de servicios e incidencias',
-              'Pago por Transferencia CBU / Alias sin comisión'
-            ])
-          ],
-          ctaText: 'Elegir ' + (row.nombre || code),
-          ctaUrl: 'https://alquileres.thalmorcoding.ar/login?plan=' + encodeURIComponent(code)
-        };
-      });
-      return [trialCard, ...mapped];
+      return rows
+        .slice()
+        .sort((a, b) => Number(a.orden ?? 0) - Number(b.orden ?? 0))
+        .map((row) => {
+          const code = String(row.codigo || '').toUpperCase();
+          const maxU = row.max_unidades == null ? null : Number(row.max_unidades);
+          const mensual = Number(row.precio_mensual_ars || 0);
+          const anual = Number(row.precio_anual_ars || 0);
+          const sinVenc = Boolean(row.sin_vencimiento);
+          const esRegistro = Boolean(row.es_plan_registro);
+          const gratis = mensual === 0 && anual === 0;
+          return {
+            code,
+            name: row.nombre || code,
+            description: row.descripcion || '',
+            maxUnits: maxU,
+            monthlyPriceArs: mensual,
+            annualPriceArs: anual,
+            sinVencimiento: sinVenc,
+            esRegistro,
+            targetProfile: maxU == null || maxU > 15 ? 'INMOBILIARIA' : 'INDIVIDUAL',
+            badge: esRegistro
+              ? 'Automático al registrarte'
+              : (code === 'PRO' ? 'Más elegido' : (maxU == null ? 'Unidades ilimitadas' : 'Hasta ' + maxU + ' unidades')),
+            isPopular: code === 'PRO',
+            features: sinVenc ? FEATURES_GRATIS : featuresPago(maxU),
+            ctaText: gratis ? 'Crear cuenta gratis' : 'Elegir ' + (row.nombre || code),
+            ctaUrl: REGISTER_URL
+          };
+        });
+    }
+
+    function periodLabelFor(plan) {
+      if (plan.sinVencimiento) return 'sin vencimiento';
+      if (plan.monthlyPriceArs === 0 && plan.annualPriceArs === 0) return 'por 14 días';
+      if (currentCycle === 'ANUAL') {
+        return plan.annualPriceArs < plan.monthlyPriceArs * 12 ? '/ año · con descuento' : '/ año';
+      }
+      return '/ mes · Transferencia ARS';
     }
 
     function renderPlans() {
       const grid = document.getElementById('plans-grid');
       const filtered = currentFilter === 'ALL'
         ? currentPlans
-        : currentPlans.filter((p) => p.targetProfile === currentFilter || p.code === 'PRUEBA');
+        : currentPlans.filter((p) => p.targetProfile === currentFilter || p.esRegistro);
 
       grid.innerHTML = filtered.map((plan) => {
-        const isTrial = plan.monthlyPriceArs === 0;
-        const priceToShow = isTrial
+        const gratis = plan.monthlyPriceArs === 0 && plan.annualPriceArs === 0;
+        const priceToShow = gratis
           ? 0
           : (currentCycle === 'ANUAL' ? plan.annualPriceArs : plan.monthlyPriceArs);
-        const periodLabel = isTrial
-          ? 'por 14 días'
-          : (currentCycle === 'ANUAL' ? '/ año (ahorrás 2 meses)' : '/ mes · Transferencia ARS');
+        const periodLabel = periodLabelFor(plan);
+        const unidadesLabel = plan.maxUnits == null ? 'Ilimitadas' : 'Hasta ' + plan.maxUnits + ' unid.';
 
         const popularClasses = plan.isPopular
           ? 'border-sky-500/70 plan-popular-glow bg-slate-900/90'
           : 'border-slate-800 bg-slate-900/50 hover:border-slate-700';
 
-        const btnClasses = plan.isPopular
+        const btnClasses = plan.isPopular || plan.esRegistro
           ? 'bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold shadow-lg shadow-sky-500/20'
           : 'bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-700';
 
@@ -713,7 +652,7 @@
                   ${plan.badge}
                 </span>
                 <span class="text-[11px] font-semibold text-sky-400">
-                  Hasta ${plan.maxUnits} unid.
+                  ${unidadesLabel}
                 </span>
               </div>
 
@@ -731,9 +670,9 @@
             </div>
 
             <div class="mt-7 pt-4 border-t border-slate-800/60">
-              <a href="${plan.ctaUrl || 'https://alquileres.thalmorcoding.ar/login'}" target="_blank" rel="noopener"
+              <a href="${plan.ctaUrl}" target="_blank" rel="noopener"
                  class="w-full inline-flex items-center justify-center py-3 px-4 rounded-xl text-xs transition ${btnClasses}">
-                ${plan.ctaText || 'Comenzar Ahora'} →
+                ${plan.ctaText} →
               </a>
             </div>
           </div>
@@ -793,65 +732,57 @@
       document.getElementById('calc-volumen').textContent = '$ ' + volumen.toLocaleString('es-AR');
       document.getElementById('calc-horas').textContent = Math.max(2, unidades * 2) + ' hs / mes';
 
-      const plan = unidades <= 3
-        ? { nombre: 'Plan Inicial', precio: 15000 }
-        : (unidades <= 15 ? { nombre: 'Plan Pro', precio: 30000 } : { nombre: 'Plan Estudio', precio: 60000 });
+      // Plan más barato que alcance para esa cantidad de unidades (sin contar la prueba de 14 días).
+      const candidatos = currentPlans
+        .filter((p) => (p.maxUnits == null || p.maxUnits >= unidades) && (p.sinVencimiento || p.monthlyPriceArs > 0))
+        .sort((a, b) => a.monthlyPriceArs - b.monthlyPriceArs);
+      const plan = candidatos[0];
+      const el = document.getElementById('calc-plan-sugerido');
+      if (!plan) {
+        el.textContent = 'Consultanos por un plan a medida';
+      } else if (plan.monthlyPriceArs === 0) {
+        el.textContent = `${plan.name} (sin costo)`;
+      } else {
+        const pct = ((plan.monthlyPriceArs / Math.max(1, volumen)) * 100).toFixed(1).replace('.', ',');
+        el.textContent = `${plan.name} (${pct}% del flujo)`;
+      }
+    }
 
-      const pct = ((plan.precio / Math.max(1, volumen)) * 100).toFixed(1).replace('.', ',');
-      document.getElementById('calc-plan-sugerido').textContent = `${plan.nombre} (${pct}% del flujo)`;
+    function aplicarPlanes(rows, mensaje) {
+      const normalized = normalizeDbRowsToPlans(rows);
+      if (!normalized || normalized.length === 0) return false;
+      currentPlans = normalized;
+      renderPlans();
+      updateCalculator();
+      const statusText = document.getElementById('sync-status-text');
+      if (statusText && mensaje) statusText.textContent = mensaje;
+      return true;
     }
 
     async function syncLivePlans() {
-      renderPlans();
-      const statusText = document.getElementById('sync-status-text');
+      aplicarPlanes(FALLBACK_ROWS, 'Planes oficiales de El Encargado (alquileres.thalmorcoding.ar)');
 
-      // 1) Intentar endpoint público de El Encargado (/api/public/plans)
+      // 1) API pública de El Encargado: planes activos cargados en Admin SaaS.
       try {
         const res = await fetch(ALQUILERES_API_URL, { headers: { 'Accept': 'application/json' } });
         if (res.ok) {
           const data = await res.json();
-          if (data && Array.isArray(data.plans) && data.plans.length > 0) {
-            currentPlans = data.plans;
-            renderPlans();
-            statusText.textContent = 'Planes actualizados en tiempo real desde alquileres.thalmorcoding.ar';
-            return;
-          }
-          if (data && Array.isArray(data.plan_plataforma) && data.plan_plataforma.length > 0) {
-            const normalized = normalizeDbRowsToPlans(data.plan_plataforma);
-            if (normalized) {
-              currentPlans = normalized;
-              renderPlans();
-              statusText.textContent = 'Planes actualizados en tiempo real desde alquileres.thalmorcoding.ar';
-              return;
-            }
-          }
+          if (data && aplicarPlanes(data.plan_plataforma, 'Planes actualizados en tiempo real desde alquileres.thalmorcoding.ar')) return;
         }
       } catch (_) {}
 
-      // 2) Fallback directo a Supabase REST (public.plan_plataforma)
+      // 2) Respaldo: Supabase REST (misma tabla).
       try {
         const supRes = await fetch(SUPABASE_REST_PLANS_URL, {
-          headers: {
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwZXB0Y3NjcnBzYnpzeXZram91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3MTkxODksImV4cCI6MjEwMjI5NTE4OX0.WLlAX6J4afk3NJiwS2eUQJzc5qYi5wDdmIgVp68Co5A',
-            'Accept': 'application/json'
-          }
+          headers: { 'apikey': SUPABASE_ANON_KEY, 'Accept': 'application/json' }
         });
         if (supRes.ok) {
           const rows = await supRes.json();
-          const normalized = normalizeDbRowsToPlans(rows);
-          if (normalized && normalized.length > 1) {
-            currentPlans = normalized;
-            renderPlans();
-            statusText.textContent = 'Planes sincronizados en vivo desde Supabase (plan_plataforma)';
-            return;
-          }
+          aplicarPlanes(rows, 'Planes sincronizados en vivo desde Supabase (plan_plataforma)');
         }
       } catch (_) {}
-
-      statusText.textContent = 'Planes oficiales de El Encargado (alquileres.thalmorcoding.ar)';
     }
 
-    updateCalculator();
     syncLivePlans();
   </script>
 </body>
