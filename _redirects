@@ -12,8 +12,14 @@ https://www.thalmorcoding.com.ar/* https://thalmorcoding.ar/:splat 301!
 /utilidades/EDITORPDF /utilidades/editorpdf.html 301!
 
 # Mi Mostrador — privacidad. 200 (rewrite), sin 301, para Partner Center y variantes de mayúsculas.
-# Los archivos canónicos ya responden 200: /Mostrador/Privacy.html, /Mostrados/Privacy.html,
-# /privacidad.html, /privacidad/index.html y /privacidad/.
+# Pretty URLs del sitio convierte /Carpeta/Archivo.html en un 301 a la ruta en minúsculas
+# y sin extensión. Estas reglas con ! se evalúan antes y devuelven el HTML con 200.
+/Mostrador/Privacy.html     /privacidad/index.html   200!
+/Mostrados/Privacy.html     /privacidad/index.html   200!
+/Utilidades.html            /utilidades/index.html   200!
+/Gastos                     /Gastos/index.html       200!
+/Gastos/                    /Gastos/index.html       200!
+
 /privacidad                 /privacidad/index.html   200!
 /Privacidad                 /privacidad/index.html   200!
 /PRIVACIDAD                 /privacidad/index.html   200!
