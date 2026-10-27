@@ -11,6 +11,47 @@ https://www.thalmorcoding.com.ar/* https://thalmorcoding.ar/:splat 301!
 /utilidades/EDITORPDF.html /utilidades/editorpdf.html 301!
 /utilidades/EDITORPDF /utilidades/editorpdf.html 301!
 
+# Mi Mostrador — privacidad. 200 (rewrite), sin 301, para Partner Center y variantes de mayúsculas.
+# Los archivos canónicos ya responden 200: /Mostrador/Privacy.html, /Mostrados/Privacy.html,
+# /privacidad.html, /privacidad/index.html y /privacidad/.
+/privacidad                 /privacidad/index.html   200!
+/Privacidad                 /privacidad/index.html   200!
+/PRIVACIDAD                 /privacidad/index.html   200!
+/Privacidad.html            /privacidad.html         200
+/PRIVACIDAD.html            /privacidad.html         200
+/PRIVACIDAD.HTML            /privacidad.html         200
+/privacidad/Index.html      /privacidad/index.html   200
+/privacidad/INDEX.HTML      /privacidad/index.html   200
+
+/mostrador/privacy.html     /Mostrador/Privacy.html  200
+/mostrador/Privacy.html     /Mostrador/Privacy.html  200
+/Mostrador/privacy.html     /Mostrador/Privacy.html  200
+/MOSTRADOR/privacy.html     /Mostrador/Privacy.html  200
+/MOSTRADOR/Privacy.html     /Mostrador/Privacy.html  200
+/MOSTRADOR/PRIVACY.HTML     /Mostrador/Privacy.html  200
+/mostrador/PRIVACY.HTML     /Mostrador/Privacy.html  200
+/Mostrador/PRIVACY.HTML     /Mostrador/Privacy.html  200
+
+/mostrados/privacy.html     /Mostrados/Privacy.html  200
+/mostrados/Privacy.html     /Mostrados/Privacy.html  200
+/Mostrados/privacy.html     /Mostrados/Privacy.html  200
+/MOSTRADOS/privacy.html     /Mostrados/Privacy.html  200
+/MOSTRADOS/Privacy.html     /Mostrados/Privacy.html  200
+/MOSTRADOS/PRIVACY.HTML     /Mostrados/Privacy.html  200
+/mostrados/PRIVACY.HTML     /Mostrados/Privacy.html  200
+/Mostrados/PRIVACY.HTML     /Mostrados/Privacy.html  200
+
+# Hub. Sin asterisco: no reescribe /utilidades/editorpdf.html ni otros archivos del directorio.
+/utilidades.html            /Utilidades.html         200
+/UTILIDADES.html            /Utilidades.html         200
+/UTILIDADES.HTML            /Utilidades.html         200
+/Utilidades.HTML            /Utilidades.html         200
+/Utilidades                 /Utilidades.html         200
+/UTILIDADES                 /Utilidades.html         200
+/utilidades                 /utilidades/index.html   200!
+/utilidades/Index.html      /utilidades/index.html   200
+/utilidades/INDEX.HTML      /utilidades/index.html   200
+
 /energia/* /energia/index.html 200
 
 /api/recetario /.netlify/functions/recetario 200

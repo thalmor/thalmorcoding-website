@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Utilidades | ThalmorCoding</title>
+    <meta
+      name="description"
+      content="Hub privado de utilidades y páginas de ThalmorCoding: PDF, recetario, energía, gastos y políticas de las apps."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+            },
+            colors: {
+              brand: {
+                50: "#eef7ff",
+                400: "#38bdf8",
+                500: "#0ea5e9",
+                600: "#0284c7",
+                700: "#0369a1",
+              },
+            },
+            boxShadow: {
+              glow: "0 0 0 1px rgba(56,189,248,0.25), 0 12px 40px rgba(2,132,199,0.2)",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-brand-500/30">
+    <header class="sticky top-0 z-40 border-b border-white/10 bg-slate-950/80 backdrop-blur">
+      <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4 lg:px-8">
+        <a href="/" class="text-xl font-extrabold tracking-tight text-white">
+          Thalmor<span class="text-brand-400">Coding</span>
+        </a>
+        <a href="/" class="text-sm font-medium text-slate-300 transition hover:text-white">Inicio</a>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-6 py-14 lg:px-8 lg:py-20">
+      <p class="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-400">Hub privado</p>
+      <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Utilidades</h1>
+      <p class="mt-4 max-w-2xl text-lg text-slate-300">
+        Acceso directo a las herramientas internas y a las páginas públicas de cada app.
+      </p>
+
+      <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <label class="relative block min-w-0 flex-1">
+          <span class="sr-only">Buscar</span>
+          <input
+            id="q"
+            type="search"
+            autocomplete="off"
+            placeholder="Buscar por nombre, app o ruta…"
+            class="w-full rounded-xl border border-white/15 bg-slate-900 px-4 py-3 text-base text-white placeholder:text-slate-500 focus:border-brand-400 focus:outline-none"
+          />
+        </label>
+        <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrar por tipo">
+          <button type="button" data-filter="todas" aria-pressed="true" class="filter-btn rounded-full border border-brand-400/50 bg-brand-500/15 px-4 py-2 text-sm font-semibold text-white">
+            Todas
+          </button>
+          <button type="button" data-filter="utilidad" aria-pressed="false" class="filter-btn rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-300">
+            Utilidades
+          </button>
+          <button type="button" data-filter="app" aria-pressed="false" class="filter-btn rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-300">
+            Apps y políticas
+          </button>
+        </div>
+      </div>
+      <p id="count" class="mt-3 text-sm text-slate-400" aria-live="polite"></p>
+
+      <div id="grid" class="mt-8 grid gap-5 md:grid-cols-2">
+        <article
+          data-card
+          data-kind="utilidad"
+          data-text="editor compresor pdf ocr unir dividir rotar extraer texto navegador /utilidades/editorpdf.html"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-glow"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-brand-400">Utilidad</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Editor y Compresor de PDF + OCR</h2>
+          <p class="mt-3 flex-1 text-slate-300">
+            Unir, dividir, rotar, comprimir y extraer texto (OCR) de PDFs 100% en el navegador.
+          </p>
+          <a href="/utilidades/editorpdf.html" class="mt-5 inline-flex items-center text-sm font-semibold text-brand-400 hover:text-brand-300">
+            Abrir /utilidades/editorpdf.html →
+          </a>
+        </article>
+
+        <article
+          data-card
+          data-kind="utilidad"
+          data-text="recetario privado recetas historial pin /recetario.html"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-brand-400">Utilidad</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Recetario Privado</h2>
+          <p class="mt-3 flex-1 text-slate-300">Gestión de recetas e historial con PIN.</p>
+          <a href="/recetario.html" class="mt-5 inline-flex items-center text-sm font-semibold text-brand-400 hover:text-brand-300">
+            Abrir /recetario.html →
+          </a>
+        </article>
+
+        <article
+          data-card
+          data-kind="utilidad"
+          data-text="control de energia tablero consumo electrico /energia/"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-brand-400">Utilidad</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Control de Energía</h2>
+          <p class="mt-3 flex-1 text-slate-300">Tablero y seguimiento de consumo eléctrico.</p>
+          <a href="/energia/" class="mt-5 inline-flex items-center text-sm font-semibold text-brand-400 hover:text-brand-300">
+            Abrir /energia/ →
+          </a>
+        </article>
+
+        <article
+          data-card
+          data-kind="utilidad"
+          data-text="divide tus gastos calculadora divisor /gastos/ privacidad eliminacion"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-brand-400">Utilidad</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Divide tus Gastos</h2>
+          <p class="mt-3 flex-1 text-slate-300">
+            Calculadora y divisor de gastos. En el sitio están la portada, la privacidad y la eliminación de datos; la app guarda todo en el teléfono.
+          </p>
+          <div class="mt-5 flex flex-col gap-2 text-sm font-semibold">
+            <a href="/Gastos/" class="text-brand-400 hover:text-brand-300">Abrir /Gastos/ →</a>
+            <a href="/Gastos/Privacy.html" class="text-slate-300 hover:text-white">Privacidad</a>
+            <a href="/Gastos/DataDeletion.html" class="text-slate-300 hover:text-white">Eliminación de datos</a>
+          </div>
+        </article>
+
+        <article
+          data-card
+          data-kind="app"
+          data-text="mi mostrador privacidad punto de venta /privacidad /mostrador/privacy.html /mostrados/privacy.html"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-300">App y política</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Mi Mostrador — Privacidad</h2>
+          <p class="mt-3 flex-1 text-slate-300">
+            Política que verifica Microsoft Partner Center en /privacidad, con las mismas copias en Mostrador y Mostrados.
+          </p>
+          <div class="mt-5 flex flex-col gap-2 text-sm font-semibold">
+            <a href="/privacidad" class="text-brand-400 hover:text-brand-300">Abrir /privacidad →</a>
+            <a href="/Mostrador/Privacy.html" class="text-slate-300 hover:text-white">/Mostrador/Privacy.html</a>
+            <a href="/Mostrados/Privacy.html" class="text-slate-300 hover:text-white">/Mostrados/Privacy.html</a>
+          </div>
+        </article>
+
+        <article
+          data-card
+          data-kind="app"
+          data-text="el encargado alquileres contratos inquilinos /alquileres/"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-300">App</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">El Encargado</h2>
+          <p class="mt-3 flex-1 text-slate-300">Gestión de alquileres, contratos e inquilinos.</p>
+          <a href="/Alquileres/" class="mt-5 inline-flex items-center text-sm font-semibold text-brand-400 hover:text-brand-300">
+            Abrir /Alquileres/ →
+          </a>
+        </article>
+
+        <article
+          data-card
+          data-kind="app"
+          data-text="cabeza de serie torneos canchas abonos /cabezadeserie/ privacidad"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-300">App y política</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Cabeza de Serie</h2>
+          <p class="mt-3 flex-1 text-slate-300">Gestión de torneos, canchas, abonos y caja.</p>
+          <div class="mt-5 flex flex-col gap-2 text-sm font-semibold">
+            <a href="/cabezadeserie/" class="text-brand-400 hover:text-brand-300">Abrir /cabezadeserie/ →</a>
+            <a href="https://cabezadeserie.com.ar/privacidad" class="text-slate-300 hover:text-white" target="_blank" rel="noopener noreferrer">Política de privacidad</a>
+          </div>
+        </article>
+
+        <article
+          data-card
+          data-kind="app"
+          data-text="baqueano danzas folkloricas privacidad windows android /baqueano/"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-300">App y política</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Baqueano</h2>
+          <p class="mt-3 flex-1 text-slate-300">Música para danzas folklóricas, en Windows y en el control remoto Android.</p>
+          <div class="mt-5 flex flex-col gap-2 text-sm font-semibold">
+            <a href="/Baqueano/" class="text-brand-400 hover:text-brand-300">Abrir /Baqueano/ →</a>
+            <a href="/Baqueano/Privacy.html" class="text-slate-300 hover:text-white">Privacidad Windows</a>
+            <a href="/Baqueano/PrivacyAndroid.html" class="text-slate-300 hover:text-white">Privacidad Android</a>
+          </div>
+        </article>
+
+        <article
+          data-card
+          data-kind="app"
+          data-text="pliego lector pdf liviano privacidad terminos precios reembolsos /pliego/"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-300">App y política</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Pliego</h2>
+          <p class="mt-3 flex-1 text-slate-300">Lector de PDF liviano. Páginas legales publicadas en el sitio.</p>
+          <div class="mt-5 flex flex-col gap-2 text-sm font-semibold">
+            <a href="/Pliego/Privacy.html" class="text-brand-400 hover:text-brand-300">Privacidad →</a>
+            <a href="/Pliego/Terms.html" class="text-slate-300 hover:text-white">Términos</a>
+            <a href="/Pliego/Pricing.html" class="text-slate-300 hover:text-white">Precios</a>
+            <a href="/Pliego/Refunds.html" class="text-slate-300 hover:text-white">Reembolsos</a>
+          </div>
+        </article>
+
+        <article
+          data-card
+          data-kind="app"
+          data-text="mis radios privacidad eliminacion de datos /misradios/"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-300">App y política</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Mis Radios</h2>
+          <p class="mt-3 flex-1 text-slate-300">Política de privacidad y eliminación de datos.</p>
+          <div class="mt-5 flex flex-col gap-2 text-sm font-semibold">
+            <a href="/MisRadios/Privacy.html" class="text-brand-400 hover:text-brand-300">Privacidad →</a>
+            <a href="/MisRadios/DataDeletion.html" class="text-slate-300 hover:text-white">Eliminación de datos</a>
+          </div>
+        </article>
+
+        <article
+          data-card
+          data-kind="app"
+          data-text="meeple shelf juegos de mesa privacidad eliminacion /meepleshelf/"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-300">App y política</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Meeple Shelf</h2>
+          <p class="mt-3 flex-1 text-slate-300">Página del producto, privacidad y eliminación de datos.</p>
+          <div class="mt-5 flex flex-col gap-2 text-sm font-semibold">
+            <a href="/MeepleShelf/meeple-shelf.html" class="text-brand-400 hover:text-brand-300">Abrir la página →</a>
+            <a href="/MeepleShelf/Privacy.html" class="text-slate-300 hover:text-white">Privacidad</a>
+            <a href="/MeepleShelf/DataDeletion.html" class="text-slate-300 hover:text-white">Eliminación de datos</a>
+          </div>
+        </article>
+
+        <article
+          data-card
+          data-kind="app"
+          data-text="regalisima privacidad eliminacion de datos /regalisima/"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-300">App y política</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Regalísima</h2>
+          <p class="mt-3 flex-1 text-slate-300">Política de privacidad y eliminación de datos.</p>
+          <div class="mt-5 flex flex-col gap-2 text-sm font-semibold">
+            <a href="/Regalisima/Privacy.html" class="text-brand-400 hover:text-brand-300">Privacidad →</a>
+            <a href="/Regalisima/DataDeletion.html" class="text-slate-300 hover:text-white">Eliminación de datos</a>
+          </div>
+        </article>
+
+        <article
+          data-card
+          data-kind="app"
+          data-text="descargas mostrador releases /descargas/"
+          class="flex flex-col rounded-2xl border border-white/10 bg-slate-900/80 p-6"
+        >
+          <p class="text-xs font-semibold uppercase tracking-wider text-amber-300">Descargas</p>
+          <h2 class="mt-2 text-2xl font-bold text-white">Descargas</h2>
+          <p class="mt-3 flex-1 text-slate-300">Instaladores y releases publicados, incluido Mostrador.</p>
+          <a href="/descargas/" class="mt-5 inline-flex items-center text-sm font-semibold text-brand-400 hover:text-brand-300">
+            Abrir /descargas/ →
+          </a>
+        </article>
+      </div>
+
+      <p id="empty" class="mt-10 hidden rounded-2xl border border-dashed border-white/15 px-6 py-10 text-center text-slate-400">
+        Ninguna tarjeta coincide con ese filtro.
+      </p>
+    </main>
+
+    <footer class="border-t border-white/10 py-8 text-center text-sm text-slate-500">
+      ThalmorCoding · hub interno
+    </footer>
+
+    <script>
+      (function () {
+        var input = document.getElementById("q");
+        var cards = Array.prototype.slice.call(document.querySelectorAll("[data-card]"));
+        var empty = document.getElementById("empty");
+        var count = document.getElementById("count");
+        var buttons = Array.prototype.slice.call(document.querySelectorAll("[data-filter]"));
+        var kind = "todas";
+
+        function fold(value) {
+          return value
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function paint(button, on) {
+          button.setAttribute("aria-pressed", on ? "true" : "false");
+          button.classList.toggle("border-brand-400/50", on);
+          button.classList.toggle("bg-brand-500/15", on);
+          button.classList.toggle("text-white", on);
+          button.classList.toggle("border-white/15", !on);
+          button.classList.toggle("text-slate-300", !on);
+        }
+
+        function apply() {
+          var needle = fold(input.value.trim());
+          var visible = 0;
+          cards.forEach(function (card) {
+            var haystack = fold(card.getAttribute("data-text") || "");
+            var okKind = kind === "todas" || card.getAttribute("data-kind") === kind;
+            var show = okKind && (!needle || haystack.indexOf(needle) !== -1);
+            card.classList.toggle("hidden", !show);
+            if (show) visible += 1;
+          });
+          empty.classList.toggle("hidden", visible !== 0);
+          count.textContent = visible === 1 ? "1 resultado" : visible + " resultados";
+        }
+
+        input.addEventListener("input", apply);
+        buttons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            kind = button.getAttribute("data-filter");
+            buttons.forEach(function (other) {
+              paint(other, other === button);
+            });
+            apply();
+          });
+        });
+        apply();
+      })();
+    </script>
+  </body>
+</html>

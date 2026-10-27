@@ -32,6 +32,8 @@
   }
   .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px}
   .brand .dot{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+  .hub-link{color:var(--muted); font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap}
+  .hub-link:hover{color:var(--text)}
   .spacer{flex:1}
   .btn{
     appearance:none; border:1px solid var(--line); background:var(--panel2); color:var(--text);
@@ -135,6 +137,7 @@
 <body>
 <header>
   <div class="bar">
+    <a class="hub-link" href="/Utilidades.html">← Todas las utilidades</a>
     <div class="brand"><span class="dot"></span> Editor de PDF</div>
     <div class="spacer"></div>
     <button class="btn" id="addBtn">
